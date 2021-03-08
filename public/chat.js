@@ -12,7 +12,15 @@ boton.addEventListener('click',function(){
         usuario:nombre.value})
    
 });
-
-Socket.on('notificacion',function(data){
+mensaje.addEventListener('keypress',function(){
+    Socket.emit('typing',{usuario:nombre.value})
+})
+Socket.on('notificacion:mensaje',function(data){
     caja.innerHTML+=`<p><strong>${data.usuario}:</strong> ${data.mensaje}</p>`;
+    mensaje.value='';
+    mensaje.accion='';
+});
+Socket.on('notificacion:typing',function(data){
+    accion.innerHTML+=`<p>${data.usuario} esta escribiendo....</p>`;
+    
 });

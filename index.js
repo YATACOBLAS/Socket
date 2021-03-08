@@ -31,6 +31,11 @@ io.on('connection',(socket)=>{
     socket.on('mensaje',(data)=>{
         //io => es la coneccion de todo , entrera la 
         //sockets, es decir todos los que estan conectados    
-        io.sockets.emit('notificacion',data);
+        io.sockets.emit('notificacion:mensaje',data);
+    })
+    socket.on('typing',(data)=>{
+        //io => es la coneccion de todo , entrera la 
+        //sockets, es decir todos los que estan conectados    
+        io.sockets.emit('notificacion:typing',data);
     })
 });
