@@ -1,11 +1,19 @@
 const express= require('express');
 const app = express();
 const path= require('path');
-
-
+const mysql =require('mysql');
+//url de la base de datos
+// mysql://:8253dddd@/?reconnect=true
 //settings
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 8080);
 
+const connection= mysql.createConnection({
+    host:'us-cdbr-east-03.cleardb.com',
+    user:'b22b2cd12e8323',
+    password:'8253dddd',
+    database:'heroku_7cde431e4aab46a'    
+})
+ 
 //static files
 app.use(express.static(path.join(__dirname +'/public')));
 
