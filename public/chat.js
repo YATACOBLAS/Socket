@@ -13,14 +13,22 @@ boton.addEventListener('click',function(){
    
 });
 mensaje.addEventListener('keypress',function(){
-    Socket.emit('typing',{usuario:nombre.value})
+    Socket.emit('typing',nombre.value)
 })
 Socket.on('notificacion:mensaje',function(data){
     caja.innerHTML+=`<p><strong>${data.usuario}:</strong> ${data.mensaje}</p>`;
     mensaje.value='';
-    mensaje.accion='';
+    accion.innerHTML='';
 });
 Socket.on('notificacion:typing',function(data){
-    accion.innerHTML+=`<p>${data.usuario} esta escribiendo....</p>`;
-    
+    accion.innerHTML=`<p>${data} esta escribiendo....</p>`;
+   
+});
+Socket.on('notificacion:estado',function(data){
+    lista.innerHTML+=`<p>${data}</p>`;
+  
+});
+Socket.on('notificacion:no_estado',function(data){
+    lista.innerHTML+=`<p>${data}</p>`;
+  
 });
