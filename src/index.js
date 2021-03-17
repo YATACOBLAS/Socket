@@ -2,37 +2,50 @@ const express= require('express');
 const path= require('path');
 const mysql =require('mysql');
 const cors =require('cors');
-const myConnection = require('express-myconnection')
+const myConnection = require('express-myconnection');
 
 const app = express();
 //url de la base de datos
 // mysql://:8253dddd@/?reconnect=true
 //settings
-app.set('port', process.env.PORT || 8080);
+app.set('port', process.env.PORT || 3000);
 
-app.use (myConnection(mysql,{
+app.use(myConnection(mysql, {
     host:'us-cdbr-east-03.cleardb.com',
     user:'b22b2cd12e8323',
     password:'8253dddd',
-    database:'heroku_7cde431e4aab46a'    
+    port:3306 ,
+    database:'heroku_7cde431e4aab46a'
 },'single'));
  
+// app.use(myConnection(mysql, {
+//     host:'178.128.68.102',
+//     user:'fixblue',
+//     password:'$Fixblue_remoto%123',
+//     port:3306 ,
+//     database:'FIXBLUE'
+// },'single'));
 
+
+
+// con.connect(function(err){
+//     if(err) throw err;
+//    console.log('Conected!!');
+// })
 app.use(cors());
 app.use(express.json());
+
 //application/x-www-form-urlencoded
 app.use(express.urlencoded({extended:true}));
+
+//RUTAS
+app.use('/api/', require('./routes/ListRoutes.js'));
+
 // Middleware para Vue.js router modo history
 const history = require('connect-history-api-fallback');
 app.use(history());
 //static files
-app.use(express.static(path.join(__dirname +'/public')));
-
-
-//RUTAS
-app.get('/',)
-
-
+app.use(express.static(path.join(__dirname +'/../public')));
 
 const server= app.listen(app.get('port'),()=>{
    console.log('listening port 3000'); 

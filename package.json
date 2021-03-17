@@ -5,17 +5,19 @@
   "main": "index.js",
   "scripts": {
     "start": "babel-node index.js --exec",
-    "dev": "nodemon app.js",
-    "devbabel": "nodemon app.js --exec babel-node"
+    "dev": "nodemon src/index.js",
+    "devbabel": "nodemon src/index.js --exec babel-node"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "connect-history-api-fallback": "^1.6.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-myconnection": "^1.0.4",
+    "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
     "socket.io": "^3.1.2"
   },
