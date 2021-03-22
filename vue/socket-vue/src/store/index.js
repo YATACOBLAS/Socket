@@ -18,6 +18,7 @@ export default new Vuex.Store({
       } else {
         state.usuario = decode(payload)
         console.log(state.usuario.data.rol);
+        
         if (state.usuario.data.rol === 'new') {
           router.push({ name: 'espera' })
         } else {

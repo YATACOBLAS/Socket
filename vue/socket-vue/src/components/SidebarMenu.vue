@@ -1,6 +1,6 @@
 <template>
   <div class="vh-100 sidebar-menu pams-fondo">
-    <div class="text-center"><h1>BlueS</h1></div>
+    <div class="text-center"><h1>Blue</h1></div>
     <div class="">
       <div class="row my-1">
         <button class="btn">
@@ -27,8 +27,7 @@
           type="button"
           class="btn btn-primary dropdown-toggle"
           data-mdb-toggle="dropdown"
-          aria-expanded="true"
-        >
+          aria-expanded="true"  >
           Action
         </button>
         <ul class="dropdown-menu">
@@ -42,7 +41,6 @@
         </ul>
       </div>
        <div class="row">  <button class="btn "><router-link to="/salas" style="color:white"> MENU 1 </router-link> </button>   </div>
- 
     </div>
   </div>
 </template>

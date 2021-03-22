@@ -20,6 +20,7 @@
                       Registrarse </a></p>
             </div>
         <Registro></Registro>
+          
         </div>
       </div>
     </div>

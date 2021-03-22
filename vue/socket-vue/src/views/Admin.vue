@@ -1,7 +1,7 @@
 <template>
   <div class=" container">
     <div class="row">
-      <div class="col-md-10"><h1>Aministrador</h1></div>
+      <div class="col-md-10 text-center my-2"><h1>Aministrador</h1></div>
     </div>
     <div class="row">
        <form v-on:submit.prevent class="col-md-4" >
@@ -30,22 +30,22 @@
         </div>
          <button @click="Guardar" class="btn btn-primary my-2">Guardar</button>
       </form>
-      <div class="col-md-8">
-        <table class="table " >
+      <div class="col-md-8 px-0">
+        <table class="table  " >
           <thead>
             <tr>
-              <th>
+              <th >
                 <h2>Usuarios</h2>
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class=" ">
             <tr v-for="(item, index) in usuarios" :key="index" >
               <td class="d-grid" >
                 <button :disabled="valorDesactivar"
                   @click="listarRoles(item.idusuario)"
                   type="button"
-                 style="" class="btn d-flex justify-content-between align-items-center"
+                  class="btn d-flex justify-content-between align-items-center"
                 >
                 <strong> {{ item.descripcion }}</strong>    <p>  {{ item.email }}</p>
                 </button>
@@ -53,21 +53,29 @@
             </tr>
           </tbody>
         </table>
-      </div>
-
-     
-    </div>
-
-    <div class="container">
-      <div class="row d-flex align-items-start">
-        <div class="col-md-5">
-          <h1>USUARIOS</h1>
-        </div>
-      </div>
+      </div>   
     </div>
   </div>
 </template>
 <script>
+//el dominio se usa cuando estoy usando dos servicios diferentes para servidor y cliente
+//si son el mismo dominio , solo iria io();
+//https://socket.io/docs/v3/client-initialization/
+//Y esta es la configuracion del cors por si ocurre politicas de Cors
+//https://socket.io/docs/v3/handling-cors/
+
+
+//para que no saturen el servidor
+//https://stackoverflow.com/questions/18348554/how-to-handle-when-unknown-socket-io-event/28104984
+
+import {io} from 'socket.io-client'
+var socket=io("http://localhost:3000",{
+  withCredentials: true,
+    extraHeaders: {
+      "my-custom-header": "abcd"
+     }
+  });
+
 import { mapState } from "vuex";
 export default {
   name: "PanelAdmin",
@@ -82,6 +90,7 @@ export default {
   },
   created() {
     this.listarUsuario();
+    this.getRealtimeData();
   },
   computed: {
     ...mapState(["token"]),
@@ -148,6 +157,16 @@ export default {
           console.log(err);
         });
     },
+     getRealtimeData() {
+      socket.on("notificacion:estado", fetchedData => {
+       console.log(fetchedData);
+      })
+       socket.on("notificacion:regUsuario", fetchedData => {
+       console.log(fetchedData[0][0]);
+      this.usuarios.unshift(fetchedData[0][0]);
+      })
+    }
+
   },
 };
 </script>
@@ -163,6 +182,10 @@ export default {
   }
   .new{ background-color:#4c75a3;
   color:white;
+  }
+  .table-body{
+    max-height: 30px  !important;
+    overflow: auto;
   }
 
 </style>

@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 
+
+
 api.listarUsuario = (req, res) => {
     req.getConnection((err, conn) => {
         conn.query('select idusuario,descripcion,email from usuario', (err, result) => {
@@ -22,7 +24,7 @@ api.listarRoles = (req, res) => {
 };
 api.saveRoles = (req, res) => {
     var iteracion = req.body.roles.length;
-    Roles(req.body, iteracion - 1, req, res);
+    Roles(req.body, iteracion-1, req, res);
 };
 
 function Roles(body, iteracion, peticion, respuesta) {
@@ -33,7 +35,6 @@ function Roles(body, iteracion, peticion, respuesta) {
                 err
             });
         } else {
-
             var idusuario = body.idusuario;
             var idrol = body.roles[iteracion].rol;
             var privilegio = body.roles[iteracion].privilegio;
@@ -48,11 +49,9 @@ function Roles(body, iteracion, peticion, respuesta) {
             });
         }
     });
-
 }
 
 api.saveUsers = (req, res) => {
-
     var user = req.body.usuario;
     var email = req.body.email;
     var pass = bcrypt.hashSync(req.body.password, saltRounds);
@@ -70,16 +69,17 @@ api.saveUsers = (req, res) => {
                     err
                 });
             }
-            res.json(result);
+
+            var io=req.app.get('socket.io');
+            io.sockets.emit('notificacion:regUsuario',result);
+            res.json({mensaje:'registrado'});
         });
     })
 };
 
 api.login = (req, res) => {
-
     var email = req.body.email;
     var pass = req.body.pass;
-
     req.getConnection((err, conn) => {
         if (err) {
             res.status(500).json({
@@ -107,7 +107,7 @@ api.login = (req, res) => {
 
                 if (!bcrypt.compareSync(pass, password)) {
                     res.status(500).json({
-                        mensaje: 'Ocurrio un error',
+                        mensaje: 'Error en sus credenciales',
                         err
                     });
                 } else {
@@ -136,6 +136,9 @@ api.login = (req, res) => {
     })
 };
 
+
+module.exports = api;
+
 // Controller.listar=(req,res)=> {
 //     var desde =req.query.desde;
 //     var hasta =req.query.hasta;
@@ -153,5 +156,3 @@ api.login = (req, res) => {
 
 //        });
 //    });
-
-module.exports = api;

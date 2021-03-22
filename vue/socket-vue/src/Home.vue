@@ -1,33 +1,23 @@
 <template>
-
-       
-      <div :class="{'row':estadoActivo}" class="m-0">
-        
-            <Sidebar class="col-2" v-if="estadoActivo"></Sidebar>
-        
-        <div class="col-10">
-           <Nav v-if="estadoActivo && usuario.data.rol === 'usuario'" name="usuario.data" ></Nav>
-        <Navadmin v-if="estadoActivo && usuario.data.rol === 'admin'"> </Navadmin>
+      <div>       
+                <Navega v-if="estadoActivo && usuario.data.rol === 'admin'" ></Navega>
            <router-view/>
-        </div>
       </div>
-        
-   
  
 </template>
 <script>
-import Sidebar from './components/SidebarMenu'
 import {mapGetters, mapActions,mapState} from 'vuex'
-import Nav from './components/Nav'
-import Navadmin from './components/NavAdmin'
+
+import Navega from './components/Navegacion'
 export default {
 name:'HomePrincipal',
 components:{
-  Nav,Navadmin,Sidebar
+ Navega
   },
   data() {
     return {
-      clase:'row'
+      clase:'row',
+  
     }
   },
  computed:{
@@ -52,6 +42,6 @@ components:{
         // this.$router.go(0);
       }
     };
-  },
+  }
 }
 </script>

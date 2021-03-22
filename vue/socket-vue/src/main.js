@@ -9,6 +9,9 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import Vuelidate from 'vuelidate'
 
+// import VueSidebarMenu from 'vue-sidebar-menu'
+// import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
+
 Vue.use(Vuelidate);
 Vue.use(VueAxios,axios);
 // Vue.use(BootstrapVue)
