@@ -6,8 +6,8 @@ import Salas from '../views/Salas'
 import Espera from'../views/Espera'
 import Admin from'../views/Admin'
 import NotFound from '../views/NotFound'
-
 import store from '../store/index'
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -22,8 +22,8 @@ const routes = [
     path: '/salas',
     name: 'salas',
     component:Salas,
-    meta:{requireAuth:true}
-
+    meta:{requireAuth:true},
+   
   },
   
   {

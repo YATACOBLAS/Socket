@@ -92,9 +92,7 @@ export default {
     }
 
   },
-  created() {
 
-  },
   methods: {
     Registrar(){
 

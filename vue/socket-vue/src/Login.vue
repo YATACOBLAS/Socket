@@ -47,11 +47,11 @@ export default {
     ...mapActions(['guardarUsuario']),
     ingresar(){
        this.axios.post('/Login',{email:this.email,pass:this.password }).then(res=>{              
-                    this.email='';
+                  
+              this.guardarUsuario(res.data.token);
+                 this.email='';
                     this.password='';
                      this.mensajeError='';
-              this.guardarUsuario(res.data.token);
-               
            }).catch(err=>{
              this.email='';
              this.password='';

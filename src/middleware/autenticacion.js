@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 
 
 const verificarAuth= (req,res,next)=>{
-
 let token=req.get('token');
 
 jwt.verify(token,'SECRETO_PAMS_2021_TRAZABILIDAD_SECRETO',(err,decode)=>{
@@ -13,6 +12,7 @@ jwt.verify(token,'SECRETO_PAMS_2021_TRAZABILIDAD_SECRETO',(err,decode)=>{
                 err
             });
         }
+        
          req.usuario =decode.data
 
     next();
@@ -25,7 +25,7 @@ const verificarRol=(req,res,next)=>{
 
     const rol =req.usuario.rol
 
-    if(rol=='admin'){
+    if(rol=='administrador'){
         next();
     }else{    
             res.status(401).json({

@@ -11,27 +11,21 @@ export default new Vuex.Store({
   },
   mutations: {
     obtenerUsuario(state, payload) {
-
       state.token = payload;
       if (payload === '') {
         state.usuario = ''
       } else {
         state.usuario = decode(payload)
-        console.log(state.usuario.data.rol);
-        
+        console.log(state.usuario.data.rol);     
         if (state.usuario.data.rol === 'new') {
           router.push({ name: 'espera' })
         } else {
           router.push({ name: 'salas' })
         }
-
       }
-
     }
-
   },
   actions: {
-
     guardarUsuario({ commit }, payload) {
       localStorage.setItem('token', payload);
       commit('obtenerUsuario', payload)
@@ -43,24 +37,18 @@ export default new Vuex.Store({
       router.push({ name: 'login' });
     },
 
-    leerToken({ commit }, payload) {
-      
-     const token= localStorage.getItem('token');
-      if(token){
-        commit('obtenerUsuario', token)
-      }else{
-        commit('obtenerUsuario', '');
-      }
-     
+    leerToken({ commit }, payload) {      
+      const token= localStorage.getItem('token');
+        if(token){
+          commit('obtenerUsuario', token)
+        }else{
+          commit('obtenerUsuario', '');
+        }
     },
     
     redireccionar({},payload){
       
     }
-
-
-
-
 
   },
   getters: {
