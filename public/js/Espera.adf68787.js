@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["Espera"],{6924:function(e,t,n){"use strict";n.r(t);var a=function(){var e=this,t=e.$createElement;e._self._c;return e._m(0)},r=[function(){var e=this,t=e.$createElement,n=e._self._c||t;return n("div",{staticClass:"text-center mt-5"},[n("h1",[e._v("Aun NO tiene un rol asignado")])])}],s={name:"espera"},c=s,i=n("2877"),u=Object(i["a"])(c,a,r,!1,null,"e5d7b474",null);t["default"]=u.exports}}]);
+//# sourceMappingURL=Espera.adf68787.js.map
