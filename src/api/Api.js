@@ -5,6 +5,15 @@ const jwt = require('jsonwebtoken');
 const { Blob } = require('buffer');
 const fs = require('fs');
 
+api.listarEmpresa = (req, res) => {
+    req.getConnection((err, conn) => {
+        conn.query('SELECT * FROM empresa', (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+
 api.listarUsuario = (req, res) => {
     req.getConnection((err, conn) => {
         conn.query('SELECT * FROM vista_usuarios', (err, result) => {
@@ -29,6 +38,47 @@ api.listarEmpresa = (req, res) => {
         });
     });
 };
+api.listarTipoMuestraPat= (req, res) => {
+    req.getConnection((err, conn) => {
+        conn.query('select * from tipoMuestraPat', (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+api.listarMuestraPat = (req, res) => {
+    //no usar parametro id  agergar otro nombre
+    var idTipoMuestraPat=req.params.idMuestra;
+    req.getConnection((err, conn) => {
+        conn.query('select idMuestraPat, descripcion from muestraPat WHERE idTipoMuestraPat = ?',[idTipoMuestraPat], (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+
+
+api.listarExamHoyPatologia = (req, res) => {
+    req.getConnection((err, conn) => {
+        conn.query('select * from LISTA_HOY_EXAMEN_DE_PATOLOGIA', (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+
+
+api.listarExamPendientesPatologia = (req, res) => {
+    req.getConnection((err, conn) => {
+        conn.query('select * from LISTA_PENDIENTES_EXAMEN_DE_PATOLOGIA;', (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+
+
+
 api.listarRoles = (req, res) => {
     var idusuario = req.params.idusuario;
     req.getConnection((err, conn) => {
@@ -43,7 +93,7 @@ api.saveRoles = (req, res) => {
     var idUsuario = req.body.idusuario;
     var descripcionRol = req.body.rol;
     req.getConnection((err, conn) => {
-        conn.query('CALL SOCKET_INSERTAR_ROL(?,?) ', [idUsuario, descripcionRol], (err, result, fields) => {
+        conn.query('CALL INSERTAR_ROL(?,?) ', [idUsuario, descripcionRol], (err, result, fields) => {
 
             if (err) {
                 respuesta.json(err)
@@ -54,11 +104,136 @@ api.saveRoles = (req, res) => {
     });
 }
 
+api.modificarExamPatologia = (req, res) => {
+console.log(req.body)
+    var iteracion= req.body.examenes.length;
+    modificarPatologia(req.body,iteracion,req,res)
+}
+function modificarPatologia(body,iteracion,peticion,respuesta){
+        var dni=peticion.body.dni;
+        var nombres=peticion.body.nombres;
+        var apellidos=body.apellidos
+        var fechaNacimiento=body.fechaNacimiento;
+        var telefono=body.telefono;
+        var empresa=body.empresa;
+        var doExamen=body.doExamen; 
+        var idExamen=body.idExamen; 
+        var fechaRegistroExamen=body.fechaRegistroExamen; 
+        var fechaAtencion=body.examenes[iteracion-1].atendido? fechaRegistroExamen: null; 
+        var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado; 
+        var cantidad=body.examenes[iteracion-1].cantidad; 
+        var fechaEnvioMuestra=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null; 
+        var fechaEnvioDocExamen=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null;
+        var estadoPago=body.examenes[iteracion-1].pagado;
+        var idMuestraPat=body.examenes[iteracion-1].id;
+        var idPaciente=body.idPaciente;
+        var idUsuario=peticion.usuario.idUsuario;  
+
+    peticion.getConnection((err, conn) => {
+        conn.query('CALL MODIFICAR_PACIENTE_EXAMEN_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
+                     [dni,nombres, apellidos,fechaNacimiento,telefono,empresa,doExamen,idExamen, 
+                     fechaRegistroExamen, fechaAtencion,fechaEntregaResultado,
+                     cantidad,fechaEnvioMuestra,fechaEnvioDocExamen,estadoPago,idMuestraPat,
+                     idPaciente,idUsuario], (err, result, fields) => {
+
+            if (err) {
+                respuesta.json(err)
+            } else {
+                iteracion--;
+                if(iteracion<1){
+                respuesta.json({ mensaje: 'Registro Exitoso' });
+                }else{
+                    modificarPatologia(body,iteracion,peticion,respuesta);
+                }
+              
+            }
+        });
+    });
+
+}
+
+
+
+api.saveExamPatologia = (req, res) => {
+    console.log(req.body)
+        var iteracion= req.body.examenes.length;
+        SavePatologia(req.body,iteracion,req,res)
+    }
+    function SavePatologia(body,iteracion,peticion,respuesta){
+        var dni=peticion.body.dni;
+        var nombres=peticion.body.nombres;
+        var apellidos=body.apellidos
+        var fechaNacimiento=body.fechaNacimiento;
+        var telefono=body.telefono;
+        var empresa=body.empresa;
+        var fechaRegistroExamen=body.fechaRegistroExamen; 
+        var fechaAtencion=body.examenes[iteracion-1].atendido? fechaRegistroExamen: null; 
+        var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado; 
+        var cantidad=body.examenes[iteracion-1].cantidad; 
+        var fechaEnvioMuestra=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null; 
+        var fechaEnvioDocExamen=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null;
+        var estadoPago=body.examenes[iteracion-1].pagado;
+        var idMuestraPat=body.examenes[iteracion-1].id;
+        var idUsuario=peticion.usuario.idUsuario;  
+    
+        peticion.getConnection((err, conn) => {
+            conn.query('CALL INSERTAR_EXAMEN_DE_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
+                         [nombres, apellidos,fechaNacimiento,telefono,dni,empresa,fechaRegistroExamen
+                            ,fechaAtencion,fechaEntregaResultado,cantidad,fechaEnvioMuestra,fechaEnvioDocExamen,estadoPago,idMuestraPat,idUsuario], (err, result, fields) => {
+    
+                if (err) {
+                    respuesta.json(err)
+                } else {
+                    iteracion--;
+                    if(iteracion<1){
+                    respuesta.json({ mensaje: 'Registro Exitoso' });
+                    }else{
+                        SavePatologia(body,iteracion,peticion,respuesta);
+                    }
+                  
+                }
+            });
+        });
+    
+    }
+
+
+
+/*
+
+api.saveRoles = (req, res) => {
+    var iteracion = req.body.roles.length;
+    Roles(req.body, iteracion-1, req, res);
+};
+
+function Roles(body, iteracion, peticion, respuesta) {
+    peticion.getConnection((error, conn) => {
+        if (error) {
+            res.status(500).json({
+                mensaje: 'Ocurrio un error',
+                err
+            });
+        } else {
+            var idusuario = body.idusuario;
+            var idrol = body.roles[iteracion].rol;
+            var privilegio = body.roles[iteracion].privilegio;
+            conn.query('CALL SOCKET_INSERTAR_ROL(?,?,?) ', [idusuario, idrol, privilegio], (err, result, fields) => {
+                if (err) {
+                    respuesta.json(err)
+                } else {
+                    if (iteracion > 0) {
+                        Roles(body, iteracion - 1, peticion, respuesta);
+                    }
+                }
+            });
+        }
+    });
+}
+*/
 
 api.saveUsers = (req, res) => {
     var user = req.body.usuario;
     var email = req.body.email;
-    var idEmpresa = req.body.idempresa
     var pass = bcrypt.hashSync(req.body.password, saltRounds);
     req.getConnection((err, conn) => {
         if (err) {
@@ -68,7 +243,7 @@ api.saveUsers = (req, res) => {
             });
             console.log('Conexion');
         }
-        conn.query('CALL SOCKET_REGISTER_USER(?,?,?,?)', [user, email, pass, idEmpresa], (err, result) => {
+        conn.query('CALL INSERTAR_USUARIO(?,?,?)', [user, email, pass], (err, result) => {
             if (err) {
                 res.status(500).json({
                     mensaje: 'Ocurrio un error',
@@ -97,7 +272,7 @@ api.login = (req, res) => {
             });
         }
 
-        conn.query('call SOCKET_LOGIN_USER(?)', [email], (err, result) => {
+        conn.query('call LOGIN(?)', [email], (err, result) => {
             if (err) {
                 res.status(500).json({
                     mensaje: 'Ocurrio un error',
@@ -125,9 +300,9 @@ api.login = (req, res) => {
                     var usuario = {
                         nombre: dato.descripcion,
                         email: dato.email,
-                        rol: dato.rol
+                        rol: dato.rol,
+                        idUsuario:dato.idUsuario
                     }
-
                     //generando un token
                     let token = jwt.sign({ data: usuario }, 'SECRETO_PAMS_2021_TRAZABILIDAD_SECRETO', { expiresIn: 60 * 60 * 24 * 30 })
                     //responder con las validaciones echas anteriormente
@@ -221,34 +396,3 @@ api.getFile = (req, res) => {
 
 module.exports = api;
 //esto me servira para registrar lso examenes
-/*
-
-api.saveRoles = (req, res) => {
-    var iteracion = req.body.roles.length;
-    Roles(req.body, iteracion-1, req, res);
-};
-
-function Roles(body, iteracion, peticion, respuesta) {
-    peticion.getConnection((error, conn) => {
-        if (error) {
-            res.status(500).json({
-                mensaje: 'Ocurrio un error',
-                err
-            });
-        } else {
-            var idusuario = body.idusuario;
-            var idrol = body.roles[iteracion].rol;
-            var privilegio = body.roles[iteracion].privilegio;
-            conn.query('CALL SOCKET_INSERTAR_ROL(?,?,?) ', [idusuario, idrol, privilegio], (err, result, fields) => {
-                if (err) {
-                    respuesta.json(err)
-                } else {
-                    if (iteracion > 0) {
-                        Roles(body, iteracion - 1, peticion, respuesta);
-                    }
-                }
-            });
-        }
-    });
-}
-*/

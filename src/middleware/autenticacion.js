@@ -21,7 +21,7 @@ jwt.verify(token,'SECRETO_PAMS_2021_TRAZABILIDAD_SECRETO',(err,decode)=>{
     
 }
 
-const verificarRol=(req,res,next)=>{
+const verificarRolAdmin=(req,res,next)=>{
 
     const rol =req.usuario.rol
 
@@ -35,6 +35,20 @@ const verificarRol=(req,res,next)=>{
     }
     
 }
+const verificarRolPatologia=(req,res,next)=>{
 
+    const rol =req.usuario.rol
 
-module.exports ={verificarAuth,verificarRol};
+    if(rol=='administrador' || rol=='patologia' ){
+       
+        next();
+      }else{    
+            res.status(401).json({
+                mensaje: 'Usuario no valido'
+            });
+     
+    }
+    
+}
+
+module.exports ={verificarAuth,verificarRolAdmin,verificarRolPatologia};

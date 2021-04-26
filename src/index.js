@@ -13,14 +13,23 @@ const app = express();
 //settings
 app.set('port', process.env.PORT || 3000);
 
-app.use(myConnection(mysql, {
-    host:'us-cdbr-east-03.cleardb.com',
-    user:'b22b2cd12e8323',
-    password:'8253dddd',
-    port:3306 ,
-    database:'heroku_7cde431e4aab46a'
-},'single'));
+// app.use(myConnection(mysql, {
+//     host:'us-cdbr-east-03.cleardb.com',
+//     user:'b22b2cd12e8323',
+//     password:'8253dddd',
+//     port:3306 ,
+//     database:'heroku_7cde431e4aab46a'
+// },'single'));
  
+
+app.use(myConnection(mysql, {
+    host:'localhost',
+    user:'root',
+    password:'root',
+    port:3306 ,
+    database:'dbpams'
+},'single'));
+
 // app.use(myConnection(mysql, {
 //     host:'178.128.68.102',
 //     user:'fixblue',
