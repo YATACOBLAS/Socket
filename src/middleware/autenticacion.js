@@ -51,4 +51,21 @@ const verificarRolPatologia=(req,res,next)=>{
     
 }
 
-module.exports ={verificarAuth,verificarRolAdmin,verificarRolPatologia};
+const verificarRolLaboratorioPams=(req,res,next)=>{
+
+    const rol =req.usuario.rol
+
+    if(rol=='administrador' || rol=='laboratorioPams' ){
+       
+        next();
+      }else{    
+            res.status(401).json({
+                mensaje: 'Usuario no valido'
+            });
+     
+    }
+    
+}
+
+
+module.exports ={verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams};

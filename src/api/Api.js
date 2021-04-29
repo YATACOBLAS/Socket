@@ -22,6 +22,8 @@ api.listarUsuario = (req, res) => {
         });
     });
 };
+
+
 api.listarRol = (req, res) => {
     req.getConnection((err, conn) => {
         conn.query('SELECT * FROM rol', (err, result) => {
@@ -38,6 +40,126 @@ api.listarEmpresa = (req, res) => {
         });
     });
 };
+
+api.listarTipoMuestraLab= (req, res) => {
+    req.getConnection((err, conn) => {
+        conn.query('select * from tipomuestralab', (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+
+api.listarMuestraLab = (req, res) => {
+    //no usar parametro id  agergar otro nombre
+    var idTipoMuestraLab=req.params.idMuestra;
+    req.getConnection((err, conn) => {
+        conn.query('select idMuestraLab, descripcion from muestraLab WHERE idTipoMuestraLab = ?',[idTipoMuestraLab], (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+
+api.listarExamHoyLaboratorio = (req, res) => {
+    req.getConnection((err, conn) => {
+        conn.query('select * from LISTA_HOY_EXAMEN_DE_LABORATORIO_PAMS;', (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+
+api.modificarExamLaboratorio = (req, res) => {
+    var iteracion= req.body.examenes.length;
+    console.log(req.body)
+ 
+ modificarLaboratorio(req.body,iteracion,req,res)
+}
+function modificarLaboratorio(body,iteracion,peticion,respuesta){
+        var dni=body.dni;
+        var nombres=body.nombres;
+        var apellidos=body.apellidos
+        var fechaNacimiento=body.fechaNacimiento;
+        var telefono=body.telefono;
+        var empresa=body.empresa;
+             var stringDoExamen=body.examenes[iteracion-1].doExamen;
+        var doExamen=(stringDoExamen=='Modificar'? 1:(stringDoExamen=='Nuevo'? 0 : -1 )) ; 
+        var idExamen=body.examenes[iteracion-1].idExamen; 
+        var fechaRegistroExamen=body.fechaRegistroExamen; 
+        var fechaAtencion=body.examenes[iteracion-1].atendido? fechaRegistroExamen: null; 
+        var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado; 
+        var idMuestraLab=body.examenes[iteracion-1].id;
+        var idPaciente=body.examenes[iteracion-1].idPaciente;
+        var idUsuario=peticion.usuario.idUsuario;  
+         
+    peticion.getConnection((err, conn) => {
+        conn.query('CALL MODIFICAR_EXAMEN_DE_LABORATORIO_PAMS(?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
+                     [dni,nombres, apellidos,fechaNacimiento,telefono,empresa,doExamen,idExamen, 
+                     fechaRegistroExamen, fechaAtencion,fechaEntregaResultado,
+                     idMuestraLab,idPaciente,idUsuario], (err, result, fields) => {
+
+            if (err) {
+                respuesta.status(400).json(err)
+            } else {
+                iteracion--;
+                if(iteracion<1){
+                respuesta.json({ mensaje: 'Registro Exitoso' });
+                }else{
+                    modificarLaboratorio(body,iteracion,peticion,respuesta);
+                }
+              
+            }
+        });
+    });
+
+}
+
+
+
+
+api.saveExamLaboratorio = (req, res) => {
+    console.log(req.body)
+
+        var iteracion= req.body.examenes.length;
+        SaveLaboratorio(req.body,iteracion,req,res)
+    }
+    function SaveLaboratorio(body,iteracion,peticion,respuesta){
+        var dni=body.dni;
+        var nombres=body.nombres;
+        var apellidos=body.apellidos
+        var fechaNacimiento=body.fechaNacimiento;
+        var telefono=body.telefono;
+        var empresa=body.empresa;
+        var fechaRegistroExamen=body.fechaRegistroExamen; 
+        var fechaAtencion=body.examenes[iteracion-1].atendido? fechaRegistroExamen: null; 
+        var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado; 
+        var idMuestraLab=body.examenes[iteracion-1].id;
+        var idUsuario=peticion.usuario.idUsuario;  
+        peticion.getConnection((err, conn) => {
+            conn.query('CALL INSERTAR_EXAMEN_DE_LABORATORIO_PAMS(?,?,?,?,?,?,?,?,?,?,?) ',
+                         [nombres, apellidos,fechaNacimiento,telefono,dni,empresa,fechaRegistroExamen
+                            ,fechaAtencion,fechaEntregaResultado,idMuestraLab,idUsuario], (err, result, fields) => {
+                if (err) {
+                    respuesta.status(400).json(err)
+                } else {
+                    iteracion--;
+                    console.log(iteracion)
+                    if(iteracion<1){
+                    respuesta.json({ mensaje: 'Registro Exitoso' });
+                    }else{
+                        SaveLaboratorio(body,iteracion,peticion,respuesta);
+                    }
+                  
+                }
+            });
+        });
+    
+    }
+
+
+
+
 api.listarTipoMuestraPat= (req, res) => {
     req.getConnection((err, conn) => {
         conn.query('select * from tipoMuestraPat', (err, result) => {
@@ -88,15 +210,15 @@ api.listarRoles = (req, res) => {
         });
     });
 };
-api.saveRoles = (req, res) => {
 
+api.saveRoles = (req, res) => {
     var idUsuario = req.body.idusuario;
     var descripcionRol = req.body.rol;
     req.getConnection((err, conn) => {
         conn.query('CALL INSERTAR_ROL(?,?) ', [idUsuario, descripcionRol], (err, result, fields) => {
 
             if (err) {
-                respuesta.json(err)
+                respuesta.status(400).json(err)
             } else {
                 res.json({ mensaje: 'Registro Exitoso' });
             }
@@ -104,40 +226,58 @@ api.saveRoles = (req, res) => {
     });
 }
 
+api.saveMuestra = (req, res) => {
+
+    var descripcion = req.body.descripcion;
+    req.getConnection((err, conn) => {
+        conn.query('call  INSERTAR_MUESTRA(?)', [descripcion], (err, result, fields) => {
+
+            if (err) {
+                respuesta.status(400).json(err)
+            } else {
+                res.json({ mensaje: 'Registro Exitoso' });
+            }
+        });
+    });
+}
+
+
 api.modificarExamPatologia = (req, res) => {
-console.log(req.body)
     var iteracion= req.body.examenes.length;
-    modificarPatologia(req.body,iteracion,req,res)
+
+ 
+ modificarPatologia(req.body,iteracion,req,res)
 }
 function modificarPatologia(body,iteracion,peticion,respuesta){
-        var dni=peticion.body.dni;
-        var nombres=peticion.body.nombres;
+
+        var dni=body.dni;
+        var nombres=body.nombres;
         var apellidos=body.apellidos
         var fechaNacimiento=body.fechaNacimiento;
         var telefono=body.telefono;
         var empresa=body.empresa;
-        var doExamen=body.doExamen; 
-        var idExamen=body.idExamen; 
+             var stringDoExamen=body.examenes[iteracion-1].doExamen;
+        var doExamen=(stringDoExamen=='Modificar'? 1:(stringDoExamen=='Nuevo'? 0 : -1 )) ; 
+        var idExamen=body.examenes[iteracion-1].idExamen; 
         var fechaRegistroExamen=body.fechaRegistroExamen; 
         var fechaAtencion=body.examenes[iteracion-1].atendido? fechaRegistroExamen: null; 
         var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado; 
         var cantidad=body.examenes[iteracion-1].cantidad; 
         var fechaEnvioMuestra=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null; 
-        var fechaEnvioDocExamen=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null;
         var estadoPago=body.examenes[iteracion-1].pagado;
         var idMuestraPat=body.examenes[iteracion-1].id;
-        var idPaciente=body.idPaciente;
+        var idPaciente=body.examenes[iteracion-1].idPaciente;
         var idUsuario=peticion.usuario.idUsuario;  
-
+         
     peticion.getConnection((err, conn) => {
-        conn.query('CALL MODIFICAR_PACIENTE_EXAMEN_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
+        conn.query('CALL MODIFICAR_PACIENTE_EXAMEN_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
                      [dni,nombres, apellidos,fechaNacimiento,telefono,empresa,doExamen,idExamen, 
                      fechaRegistroExamen, fechaAtencion,fechaEntregaResultado,
-                     cantidad,fechaEnvioMuestra,fechaEnvioDocExamen,estadoPago,idMuestraPat,
+                     cantidad,fechaEnvioMuestra,estadoPago,idMuestraPat,
                      idPaciente,idUsuario], (err, result, fields) => {
 
             if (err) {
-                respuesta.json(err)
+                respuesta.status(400).json(err)
             } else {
                 iteracion--;
                 if(iteracion<1){
@@ -155,7 +295,7 @@ function modificarPatologia(body,iteracion,peticion,respuesta){
 
 
 api.saveExamPatologia = (req, res) => {
-    console.log(req.body)
+
         var iteracion= req.body.examenes.length;
         SavePatologia(req.body,iteracion,req,res)
     }
@@ -171,18 +311,18 @@ api.saveExamPatologia = (req, res) => {
         var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado; 
         var cantidad=body.examenes[iteracion-1].cantidad; 
         var fechaEnvioMuestra=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null; 
-        var fechaEnvioDocExamen=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null;
         var estadoPago=body.examenes[iteracion-1].pagado;
         var idMuestraPat=body.examenes[iteracion-1].id;
         var idUsuario=peticion.usuario.idUsuario;  
     
         peticion.getConnection((err, conn) => {
-            conn.query('CALL INSERTAR_EXAMEN_DE_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
+            conn.query('CALL INSERTAR_EXAMEN_DE_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
                          [nombres, apellidos,fechaNacimiento,telefono,dni,empresa,fechaRegistroExamen
-                            ,fechaAtencion,fechaEntregaResultado,cantidad,fechaEnvioMuestra,fechaEnvioDocExamen,estadoPago,idMuestraPat,idUsuario], (err, result, fields) => {
+                            ,fechaAtencion,fechaEntregaResultado,cantidad,fechaEnvioMuestra,estadoPago,idMuestraPat,idUsuario], (err, result, fields) => {
     
                 if (err) {
-                    respuesta.json(err)
+                    console.log(err)
+                    respuesta.status(400).json(err)
                 } else {
                     iteracion--;
                     if(iteracion<1){
