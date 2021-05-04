@@ -70,6 +70,25 @@ api.listarExamHoyLaboratorio = (req, res) => {
     });
 };
 
+api.listarExamPendientesLaboratorio = (req, res) => {
+    req.getConnection((err, conn) => {
+        conn.query('select * from LISTA_PENDIENTE_EXAMEN_DE_LABORATORIO_PAMS', (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+
+
+api.listarExamHoyLaboratorio = (req, res) => {
+    req.getConnection((err, conn) => {
+        conn.query('select * from LISTA_HOY_EXAMEN_DE_LABORATORIO_PAMS;', (err, result) => {
+            if (err) { res.json(err) };
+            res.json(result);
+        });
+    });
+};
+
 api.modificarExamLaboratorio = (req, res) => {
     var iteracion= req.body.examenes.length;
     console.log(req.body)
@@ -115,7 +134,22 @@ function modificarLaboratorio(body,iteracion,peticion,respuesta){
 
 }
 
+api.modificarUnSoloExamLaboratorio = (req, res) => {
+    console.log(req.body)
+    var idExamen=req.body.idExamen;
+    var fechaAtencion=req.body.atendido; 
+    var fechaEntregaResultado=req.body.fechaResultado ===''? null: req.body.fechaResultado; 
+    var idMuestraLab=req.body.id;
+    var idUsuario=req.usuario.idUsuario;  
 
+    req.getConnection((err, conn) => {
+        conn.query('call MOD_UN_EXAMEN_DE_LABORATORIO_PAMS(?,?,?,?,?)',
+        [idExamen,fechaAtencion,fechaEntregaResultado,idMuestraLab,idUsuario], (err, result) => {
+            if (err) { res.status(400).json(err) };
+            res.json(result);
+        });
+    });
+};
 
 
 api.saveExamLaboratorio = (req, res) => {
@@ -294,6 +328,36 @@ function modificarPatologia(body,iteracion,peticion,respuesta){
 
 
 
+api.modificarUnSoloExamPatologia = (req, res) => {
+    console.log(req.body)
+    var idUsuario=req.usuario.idUsuario;  
+    var idExamen=req.body.idExamen; 
+    var fechaAtencion=req.body.atendido;
+    var fechaEntregaResultado=req.body.fechaResultado==''? null: req.body.fechaResultado; 
+    var cantidad=req.body.cantidad; 
+    var fechaEnvioMuestra=req.body.enviado; 
+    var estadoPago=req.body.pagado;
+     
+    req.getConnection((err, conn) => {
+                conn.query('CALL MOD_UN_EXAMEN_DE_PATOLOGIA_PAMS(?,?,?,?,?,?,?) ',
+                            [idExamen, fechaAtencion,fechaEntregaResultado,
+                            cantidad,fechaEnvioMuestra,estadoPago,idUsuario], (err, result, fields) => {
+
+                    if (err) {
+                        res.status(400).json(err)
+                    } else {
+                      
+                        res.json({ mensaje: 'Registro Exitoso' });
+                       
+                    
+                    }
+                });
+            });
+
+};
+
+
+
 api.saveExamPatologia = (req, res) => {
 
         var iteracion= req.body.examenes.length;
@@ -457,76 +521,106 @@ api.login = (req, res) => {
     })
 };
 
-api.File = async (req, res) => {
-
+//PDF CHINCHA
+api.saveResultadoPDF = async (req, res) => {    
     console.log("descripcion: ",req.file);
     console.log("buffer:", req.file.buffer);
     console.log("buffer-Length:", (req.file.buffer).length);
-
+    var idExamen=req.body.idExamen;
+    var fechaInforme=req.body.fechaInforme; 
+    var horaInforme=req.body.horaInforme; 
     var descripcion = req.body.descripcion;
-    var archivo = req.file.buffer;
+    var nivelUrgencia=req.body.nivelUrgencia;
+    var pdf=req.file.buffer;
+    var namepdf=req.file.originalname;
+    var idUsuario=req.usuario.idUsuario;  
     req.getConnection((err, conn) => {
-        conn.query('CALL SOCKET_INSERTAR_EXAMEN(?,?,?)', ['hola', archivo, 4], (err, result) => {
-            if (err) {
-                res.status(400).json({
-                    mensaje: 'Error al subir Archivo',
-                    err
-                })
-            } else {
-
-                res.status(200).json({ mensaje: 'Realizado' });
-            }
+        conn.query('CALL INSERTAR_RESULTADO_EXAMEN_PATOLOGIA(?,?,?,?,?,?,?,?)',
+        [fechaInforme,horaInforme,descripcion,nivelUrgencia,pdf,namepdf,idExamen,idUsuario], (err, result) => {
+            if (err) { res.status(400).json(err) };
+            res.json(result);
         });
     });
 };
 
-api.File = async (req, res) => {
-    console.log("descripcion: ",req.file.originalname);
-    console.log("buffer:", req.file.buffer);
-    console.log("buffer-Length:", (req.file.buffer).length);
-    // const blob = Blob.prototype.arrayBuffer(req.file.buffer);
-    // var blob = await new Blob([new Uint8Array(req.file.buffer)]);
-    var descripcion = req.file.originalname;
-    var archivo = req.file.buffer;
+api.listarExamPendientesLabChincha = (req, res) => { 
     req.getConnection((err, conn) => {
-        conn.query('CALL SOCKET_INSERTAR_EXAMEN(?,?,?)', [descripcion, archivo, 4], (err, result) => {
-            if (err) {
-                res.status(400).json({
-                    mensaje: 'Error al subir Archivo',
-                    err
-                })
-            } else {
-                res.status(200).json({ mensaje: 'Realizado' });
-            }
+        conn.query('select * from LISTA_PENDIENTE_DE_RESULTADO_PATOLOGIA_PAMS', (err, result) => {
+            if (err) { res.status(400).json(err) };
+            res.json(result);
         });
     });
 };
+
+api.listarExamPendientesLabLima = (req, res) => { 
+
+    req.getConnection((err, conn) => {
+        conn.query('select * from LISTA_PENDIENTE_DE_RESULTADO_LABORATORIO_PAMS', (err, result) => {
+            if (err) { res.status(400).json(err) };
+            res.json(result);
+        });
+    });
+};
+
+api.listarAdmisionExamLaboratorio = (req, res) => { 
+
+    req.getConnection((err, conn) => {
+        conn.query("select * from LISTA_PENDIENTE_PARA_ADMISION_DE_RESULTADO_LABORATORIO  l Left Join resultadoexamen res "+
+        "on res.idExamen=l.idExamen where res.visibilidad = true or res.visibilidad is null ;", 
+        (err, result) => {
+            if (err) { res.status(400).json(err) };
+            res.json(result);
+        });
+    });
+};
+
+api.listarAdmisionExamPatologia = (req, res) => { 
+
+    req.getConnection((err, conn) => {
+        conn.query("select * from LISTA_PENDIENTE_PARA_ADMISION_DE_RESULTADO_PATOLOGIA  l "+
+        "Left Join resultadoexamen res on res.idExamen=l.idExamen where res.visibilidad = true or res.visibilidad is null ",
+         (err, result) => {
+            if (err) { res.status(400).json(err) };
+            res.json(result);
+        });
+    });
+};
+
+api.listarResultados = (req, res) => { 
+        req.getConnection((err, conn) => {
+            conn.query("SELECT * FROM LISTAR_RESULTADO_EXAMENES_VISIBLES",
+            (err, result) => {
+                if (err) { res.status(400).json(err) };
+                res.json(result);
+            });
+        });
+};
+
+api.cambiarVisibilidadResultado = (req, res) => { 
+    var idExamen=req.body.idExamen;
+    req.getConnection((err, conn) => {
+        conn.query("update resultadoExamen set visibilidad=false where idExamen=?",[idExamen],
+         (err, result) => {
+            if (err) { res.status(400).json(err) };
+           
+            res.json(result);
+        });
+    });
+};
+
 
 api.getFile = (req, res) => {
+    
+    var idResultado=req.body.id;
+
     req.getConnection((err, conn) => {
-        conn.query('select archivo from examen where idexamen= 4', (err, result) => {
+        conn.query('select pdf , namepdf from resultadoExamen where idResultado = ?',[idResultado], (err, result) => {
             if (err)
                 res.status(500).json({ mensaje: 'Error en consulta'})
             else{
-                console.log(result[0].archivo)   
-                    // const blob = Blob.prototype.arrayBuffer(result[0].archivo);
-
-                    function _arrayBufferToBase64( buffer ) {
-                        var binary = '';
-                        var bytes = new Uint8Array( buffer );
-                        var len = bytes.byteLength;
-                        for (var i = 0; i < len; i++) {
-                            binary += String.fromCharCode( bytes[ i ] );
-                        }
-                        return  binary;
-                    }
-                   //var base64=_arrayBufferToBase64(result[0].archivo)
-                   
-                // var blob =  new Blob([new Uint8Array(result[0].archivo)]);
-                // console.log(blob)
-                console.log();
+                res.json(result[0]);
             }
-            res.status(200).json({ data: result[0].archivo });
+            
         })
     })
 

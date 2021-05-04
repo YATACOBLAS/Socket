@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 
 const verificarAuth= (req,res,next)=>{
 let token=req.get('token');
-
 jwt.verify(token,'SECRETO_PAMS_2021_TRAZABILIDAD_SECRETO',(err,decode)=>{
 
         if(err){
@@ -11,10 +10,8 @@ jwt.verify(token,'SECRETO_PAMS_2021_TRAZABILIDAD_SECRETO',(err,decode)=>{
                 mensaje: 'Error de Token',
                 err
             });
-        }
-        
+        }       
          req.usuario =decode.data
-
     next();
 
 })
@@ -31,10 +28,9 @@ const verificarRolAdmin=(req,res,next)=>{
             res.status(401).json({
                 mensaje: 'Usuario no valido'
             });
-     
-    }
-    
+    }    
 }
+
 const verificarRolPatologia=(req,res,next)=>{
 
     const rol =req.usuario.rol
@@ -45,17 +41,27 @@ const verificarRolPatologia=(req,res,next)=>{
       }else{    
             res.status(401).json({
                 mensaje: 'Usuario no valido'
-            });
-     
+            }); 
     }
-    
 }
 
 const verificarRolLaboratorioPams=(req,res,next)=>{
 
     const rol =req.usuario.rol
+    if(rol=='administrador' || rol=='laboratorioPams' ){      
+        next();
+      }else{    
+            res.status(401).json({ mensaje: 'Usuario no valido'});
+     
+    }
+    
+}
 
-    if(rol=='administrador' || rol=='laboratorioPams' ){
+const verificarRolLaboratorioTercerizado=(req,res,next)=>{
+
+    const rol =req.usuario.rol
+
+    if(rol=='administrador' || rol=='laboratorioChincha' || rol=='laboratorioLima' ){
        
         next();
       }else{    
@@ -68,4 +74,21 @@ const verificarRolLaboratorioPams=(req,res,next)=>{
 }
 
 
-module.exports ={verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams};
+const verificarRolAdmision=(req,res,next)=>{
+
+    const rol =req.usuario.rol
+
+    if(rol=='administrador'  || rol=='admision'){
+       
+        next();
+      }else{    
+            res.status(401).json({
+                mensaje: 'Usuario no valido'
+            });
+     
+    }
+    
+}
+
+
+module.exports ={verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams,verificarRolLaboratorioTercerizado,verificarRolAdmision};

@@ -3,7 +3,8 @@ const router= express.Router();
 const api= require('../api/Api.js');
 const multer = require ('multer');
 
-const {verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams}= require('../middleware/autenticacion')
+const {verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams,
+    verificarRolLaboratorioTercerizado,verificarRolAdmision}= require('../middleware/autenticacion')
 
 router.get('/listarEmpresa', api.listarEmpresa);
 //por el momento nadie lo usa se3ra quitado si no tiene uso
@@ -30,18 +31,32 @@ router.get('/listarExamHoyPatologia', api.listarExamHoyPatologia);
 router.get('/listarExamPendientesPatologia', api.listarExamPendientesPatologia);
 router.post('/saveExamPatologia',[verificarAuth,verificarRolPatologia], api.saveExamPatologia);
 router.post('/modificarExamPatologia',[verificarAuth,verificarRolPatologia], api.modificarExamPatologia);
+router.post('/modificarUnSoloExamPatologia',[verificarAuth,verificarRolPatologia], api.modificarUnSoloExamPatologia);
 
 //LaboratorioClinicoPams
 router.get('/listarTipoMuestraLab', api.listarTipoMuestraLab);
 router.get('/listarMuestraLab/:idMuestra', api.listarMuestraLab);
 router.get('/listarExamHoyLaboratorio', api.listarExamHoyLaboratorio);
+
+router.get('/listarExamPendientesLaboratorio', api.listarExamPendientesLaboratorio);
 router.post('/saveExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], api.saveExamLaboratorio);
 router.post('/modificarExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], api.modificarExamLaboratorio);
+router.post('/modificarUnSoloExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], api.modificarUnSoloExamLaboratorio);
+//LaboratorioTercerizado
+router.post('/saveResultadoPDF',[verificarAuth,verificarRolLaboratorioTercerizado],(multer().single("file")), api.saveResultadoPDF);
 //LaboratorioTercerizadoChincha
+router.get('/listarExamPendientesLabChincha',[verificarAuth,verificarRolLaboratorioTercerizado], api.listarExamPendientesLabChincha);
 //LaboratorioTercerizadoLima
+router.get('/listarExamPendientesLabLima',[verificarAuth,verificarRolLaboratorioTercerizado], api.listarExamPendientesLabLima);
+
 //Imagenes
 
+//Admision
+router.get('/listarAdmisionExamLaboratorio',[verificarAuth,verificarRolAdmision], api.listarAdmisionExamLaboratorio);
+router.get('/listarAdmisionExamPatologia',[verificarAuth,verificarRolAdmision], api.listarAdmisionExamPatologia);
+router.get('/listarResultados',[verificarAuth,verificarRolAdmision], api.listarResultados);
+router.post('/cambiarVisibilidadResultado',[verificarAuth,verificarRolAdmision], api.cambiarVisibilidadResultado);
+
 //rutas de prueba
-router.post('/File',(multer().single("file")),api.File);
-router.get('/getFile',api.getFile);
+router.post('/getFile',api.getFile);
 module.exports=router;

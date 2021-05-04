@@ -1,2 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["DiagnosticoChincha"],{"18be":function(n,e,t){"use strict";t.r(e);var i=function(){var n=this,e=n.$createElement;n._self._c;return n._m(0)},c=[function(){var n=this,e=n.$createElement,t=n._self._c||e;return t("div",[t("h1",[n._v("Diagnostico Chincha")])])}],a={name:"DiagnosticoChincha"},o=a,s=t("2877"),r=Object(s["a"])(o,i,c,!1,null,null,null);e["default"]=r.exports}}]);
-//# sourceMappingURL=DiagnosticoChincha.5fb55ae3.js.map

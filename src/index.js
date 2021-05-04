@@ -11,7 +11,7 @@ const app = express();
 //url de la base de datos
 // mysql://:8253dddd@/?reconnect=true
 //settings
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 5000);
 
 // app.use(myConnection(mysql, {
 //     host:'us-cdbr-east-03.cleardb.com',
@@ -22,10 +22,18 @@ app.set('port', process.env.PORT || 3000);
 // },'single'));
  
 
+// app.use(myConnection(mysql, {
+//     host:'localhost',
+//     user:'root',
+//     password:'root',
+//     port:3306 ,
+//     database:'dbpams'
+// },'single'));
+
 app.use(myConnection(mysql, {
     host:'localhost',
-    user:'root',
-    password:'root',
+    user:'pams',
+    password:'@pams$Server_2021',
     port:3306 ,
     database:'dbpams'
 },'single'));
@@ -59,7 +67,7 @@ app.use(history());
 app.use(express.static(path.join(__dirname +'/../public')));
 
 const server= app.listen(app.get('port'),()=>{
-   console.log('listening port 3000'); 
+   console.log('listening port 5000'); 
 });
 
 //WebSocket
