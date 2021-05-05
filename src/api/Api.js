@@ -43,8 +43,8 @@ api.listarEmpresa = (req, res) => {
 
 api.listarTipoMuestraLab= (req, res) => {
     req.getConnection((err, conn) => {
-        conn.query('select * from tipomuestralab', (err, result) => {
-            if (err) { res.json(err) };
+        conn.query('select * from tipoMuestraLab', (err, result) => {
+            if (err) { res.status(400).json(err) };
             res.json(result);
         });
     });
@@ -55,7 +55,7 @@ api.listarMuestraLab = (req, res) => {
     var idTipoMuestraLab=req.params.idMuestra;
     req.getConnection((err, conn) => {
         conn.query('select idMuestraLab, descripcion from muestraLab WHERE idTipoMuestraLab = ?',[idTipoMuestraLab], (err, result) => {
-            if (err) { res.json(err) };
+            if (err) { res.status(400).json(err) };
             res.json(result);
         });
     });
@@ -63,8 +63,8 @@ api.listarMuestraLab = (req, res) => {
 
 api.listarExamHoyLaboratorio = (req, res) => {
     req.getConnection((err, conn) => {
-        conn.query('select * from LISTA_HOY_EXAMEN_DE_LABORATORIO_PAMS;', (err, result) => {
-            if (err) { res.json(err) };
+        conn.query('select * from LISTA_HOY_EXAMEN_DE_LABORATORIO_PAMS', (err, result) => {
+            if (err) { res.status(400).json(err) };
             res.json(result);
         });
     });
@@ -73,7 +73,7 @@ api.listarExamHoyLaboratorio = (req, res) => {
 api.listarExamPendientesLaboratorio = (req, res) => {
     req.getConnection((err, conn) => {
         conn.query('select * from LISTA_PENDIENTE_EXAMEN_DE_LABORATORIO_PAMS', (err, result) => {
-            if (err) { res.json(err) };
+            if (err) { res.status(400).json(err) };
             res.json(result);
         });
     });
@@ -83,7 +83,7 @@ api.listarExamPendientesLaboratorio = (req, res) => {
 api.listarExamHoyLaboratorio = (req, res) => {
     req.getConnection((err, conn) => {
         conn.query('select * from LISTA_HOY_EXAMEN_DE_LABORATORIO_PAMS;', (err, result) => {
-            if (err) { res.json(err) };
+            if (err) { res.status(400).json(err) };
             res.json(result);
         });
     });
@@ -91,7 +91,6 @@ api.listarExamHoyLaboratorio = (req, res) => {
 
 api.modificarExamLaboratorio = (req, res) => {
     var iteracion= req.body.examenes.length;
-    console.log(req.body)
  
  modificarLaboratorio(req.body,iteracion,req,res)
 }
@@ -135,7 +134,7 @@ function modificarLaboratorio(body,iteracion,peticion,respuesta){
 }
 
 api.modificarUnSoloExamLaboratorio = (req, res) => {
-    console.log(req.body)
+ 
     var idExamen=req.body.idExamen;
     var fechaAtencion=req.body.atendido; 
     var fechaEntregaResultado=req.body.fechaResultado ===''? null: req.body.fechaResultado; 
@@ -153,8 +152,6 @@ api.modificarUnSoloExamLaboratorio = (req, res) => {
 
 
 api.saveExamLaboratorio = (req, res) => {
-    console.log(req.body)
-
         var iteracion= req.body.examenes.length;
         SaveLaboratorio(req.body,iteracion,req,res)
     }
@@ -178,7 +175,7 @@ api.saveExamLaboratorio = (req, res) => {
                     respuesta.status(400).json(err)
                 } else {
                     iteracion--;
-                    console.log(iteracion)
+                    
                     if(iteracion<1){
                     respuesta.json({ mensaje: 'Registro Exitoso' });
                     }else{
@@ -197,7 +194,7 @@ api.saveExamLaboratorio = (req, res) => {
 api.listarTipoMuestraPat= (req, res) => {
     req.getConnection((err, conn) => {
         conn.query('select * from tipoMuestraPat', (err, result) => {
-            if (err) { res.json(err) };
+            if (err) { res.status(400).json(err) };
             res.json(result);
         });
     });
@@ -329,7 +326,7 @@ function modificarPatologia(body,iteracion,peticion,respuesta){
 
 
 api.modificarUnSoloExamPatologia = (req, res) => {
-    console.log(req.body)
+
     var idUsuario=req.usuario.idUsuario;  
     var idExamen=req.body.idExamen; 
     var fechaAtencion=req.body.atendido;
@@ -522,10 +519,10 @@ api.login = (req, res) => {
 };
 
 //PDF CHINCHA
-api.saveResultadoPDF = async (req, res) => {    
-    console.log("descripcion: ",req.file);
-    console.log("buffer:", req.file.buffer);
-    console.log("buffer-Length:", (req.file.buffer).length);
+api.saveResultadoPDF = (req, res) => {    
+    // console.log("descripcion: ",req.file);
+    // console.log("buffer:", req.file.buffer);
+    // console.log("buffer-Length:", (req.file.buffer).length);
     var idExamen=req.body.idExamen;
     var fechaInforme=req.body.fechaInforme; 
     var horaInforme=req.body.horaInforme; 
@@ -565,7 +562,7 @@ api.listarExamPendientesLabLima = (req, res) => {
 api.listarAdmisionExamLaboratorio = (req, res) => { 
 
     req.getConnection((err, conn) => {
-        conn.query("select * from LISTA_PENDIENTE_PARA_ADMISION_DE_RESULTADO_LABORATORIO  l Left Join resultadoexamen res "+
+        conn.query("select * from LISTA_PENDIENTE_PARA_ADMISION_DE_RESULTADO_LABORATORIO  l Left Join resultadoExamen res "+
         "on res.idExamen=l.idExamen where res.visibilidad = true or res.visibilidad is null ;", 
         (err, result) => {
             if (err) { res.status(400).json(err) };
@@ -575,10 +572,9 @@ api.listarAdmisionExamLaboratorio = (req, res) => {
 };
 
 api.listarAdmisionExamPatologia = (req, res) => { 
-
     req.getConnection((err, conn) => {
         conn.query("select * from LISTA_PENDIENTE_PARA_ADMISION_DE_RESULTADO_PATOLOGIA  l "+
-        "Left Join resultadoexamen res on res.idExamen=l.idExamen where res.visibilidad = true or res.visibilidad is null ",
+        "Left Join resultadoExamen res on res.idExamen=l.idExamen where res.visibilidad = true or res.visibilidad is null ",
          (err, result) => {
             if (err) { res.status(400).json(err) };
             res.json(result);
@@ -608,7 +604,6 @@ api.cambiarVisibilidadResultado = (req, res) => {
     });
 };
 
-
 api.getFile = (req, res) => {
     
     var idResultado=req.body.id;
@@ -625,8 +620,6 @@ api.getFile = (req, res) => {
     })
 
 }
-
-
 
 module.exports = api;
 //esto me servira para registrar lso examenes

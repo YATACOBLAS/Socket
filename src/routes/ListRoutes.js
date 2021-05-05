@@ -1,7 +1,7 @@
 const express =require('express');
 const router= express.Router();
 const api= require('../api/Api.js');
-const multer = require ('multer');
+const multer = require('multer');
 
 const {verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams,
     verificarRolLaboratorioTercerizado,verificarRolAdmision}= require('../middleware/autenticacion')
