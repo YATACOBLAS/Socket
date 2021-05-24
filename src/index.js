@@ -13,6 +13,8 @@ const app = express();
 //settings
 app.set('port', process.env.PORT || 3000);
 
+//modificando desde Digital Ocean Yes yes
+
 // app.use(myConnection(mysql, {
 //     host:'us-cdbr-east-03.cleardb.com',
 //     user:'b22b2cd12e8323',
