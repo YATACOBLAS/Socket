@@ -26,8 +26,8 @@ router.post('/saveMuestra', api.saveMuestra);
 //Patologia
 router.get('/listarTipoMuestraPat', api.listarTipoMuestraPat);
 router.get('/listarMuestraPat/:idMuestra', api.listarMuestraPat);
-router.get('/listarExamHoyPatologia', api.listarExamHoyPatologia);
-
+router.post('/listarExamHoyPatologia',[verificarAuth,verificarRolPatologia], api.listarExamHoyPatologia);
+                    
 router.get('/listarExamPendientesPatologia', api.listarExamPendientesPatologia);
 router.post('/saveExamPatologia',[verificarAuth,verificarRolPatologia], api.saveExamPatologia);
 router.post('/modificarExamPatologia',[verificarAuth,verificarRolPatologia], api.modificarExamPatologia);
@@ -45,13 +45,14 @@ router.post('/modificarUnSoloExamLaboratorio',[verificarAuth,verificarRolLaborat
 //LaboratorioTercerizado
 router.post('/saveResultadoPDF',[verificarAuth,verificarRolLaboratorioTercerizado],(multer().single("file")), api.saveResultadoPDF);
 //LaboratorioTercerizadoChincha
-router.get('/listarExamPendientesLabChincha',[verificarAuth,verificarRolLaboratorioTercerizado], api.listarExamPendientesLabChincha);
-//LaboratorioTercerizadoLima
 router.get('/listarExamPendientesLabLima',[verificarAuth,verificarRolLaboratorioTercerizado], api.listarExamPendientesLabLima);
+//LaboratorioTercerizadoLima
+router.get('/listarExamPendientesLabChincha',[verificarAuth,verificarRolLaboratorioTercerizado], api.listarExamPendientesLabChincha);
 
 //Imagenes
 
 //Admision
+router.get('/listaCompletaDePendientesAdmision',[verificarAuth,verificarRolAdmision], api.listaCompletaDePendientesAdmision);
 router.get('/listarAdmisionExamLaboratorio',[verificarAuth,verificarRolAdmision], api.listarAdmisionExamLaboratorio);
 router.get('/listarAdmisionExamPatologia',[verificarAuth,verificarRolAdmision], api.listarAdmisionExamPatologia);
 router.get('/listarResultados',[verificarAuth,verificarRolAdmision], api.listarResultados);

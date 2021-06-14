@@ -10,6 +10,7 @@ api.listarEmpresa = (req, res) => {
         conn.query('SELECT * FROM empresa', (err, result) => {
             if (err) { res.json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -19,6 +20,7 @@ api.listarUsuario = (req, res) => {
         conn.query('SELECT * FROM vista_usuarios', (err, result) => {
             if (err) { res.json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -29,6 +31,7 @@ api.listarRol = (req, res) => {
         conn.query('SELECT * FROM rol', (err, result) => {
             if (err) { res.json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -37,6 +40,7 @@ api.listarEmpresa = (req, res) => {
         conn.query('select * from empresa', (err, result) => {
             if (err) { res.json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -46,6 +50,7 @@ api.listarTipoMuestraLab= (req, res) => {
         conn.query('select * from tipoMuestraLab', (err, result) => {
             if (err) { res.status(400).json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -57,6 +62,7 @@ api.listarMuestraLab = (req, res) => {
         conn.query('select idMuestraLab, descripcion from muestraLab WHERE idTipoMuestraLab = ?',[idTipoMuestraLab], (err, result) => {
             if (err) { res.status(400).json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -66,6 +72,7 @@ api.listarExamHoyLaboratorio = (req, res) => {
         conn.query('select * from LISTA_HOY_EXAMEN_DE_LABORATORIO_PAMS', (err, result) => {
             if (err) { res.status(400).json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -75,6 +82,7 @@ api.listarExamPendientesLaboratorio = (req, res) => {
         conn.query('select * from LISTA_PENDIENTE_EXAMEN_DE_LABORATORIO_PAMS', (err, result) => {
             if (err) { res.status(400).json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -85,6 +93,7 @@ api.listarExamHoyLaboratorio = (req, res) => {
         conn.query('select * from LISTA_HOY_EXAMEN_DE_LABORATORIO_PAMS;', (err, result) => {
             if (err) { res.status(400).json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -119,10 +128,12 @@ function modificarLaboratorio(body,iteracion,peticion,respuesta){
 
             if (err) {
                 respuesta.status(400).json(err)
+                return;
             } else {
                 iteracion--;
                 if(iteracion<1){
                 respuesta.json({ mensaje: 'Registro Exitoso' });
+                return;
                 }else{
                     modificarLaboratorio(body,iteracion,peticion,respuesta);
                 }
@@ -146,6 +157,7 @@ api.modificarUnSoloExamLaboratorio = (req, res) => {
         [idExamen,fechaAtencion,fechaEntregaResultado,idMuestraLab,idUsuario], (err, result) => {
             if (err) { res.status(400).json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -173,11 +185,13 @@ api.saveExamLaboratorio = (req, res) => {
                             ,fechaAtencion,fechaEntregaResultado,idMuestraLab,idUsuario], (err, result, fields) => {
                 if (err) {
                     respuesta.status(400).json(err)
+                    return;
                 } else {
                     iteracion--;
                     
                     if(iteracion<1){
                     respuesta.json({ mensaje: 'Registro Exitoso' });
+                    return;
                     }else{
                         SaveLaboratorio(body,iteracion,peticion,respuesta);
                     }
@@ -196,6 +210,7 @@ api.listarTipoMuestraPat= (req, res) => {
         conn.query('select * from tipoMuestraPat', (err, result) => {
             if (err) { res.status(400).json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -206,16 +221,19 @@ api.listarMuestraPat = (req, res) => {
         conn.query('select idMuestraPat, descripcion from muestraPat WHERE idTipoMuestraPat = ?',[idTipoMuestraPat], (err, result) => {
             if (err) { res.json(err) };
             res.json(result);
+            return;
         });
     });
 };
 
 
 api.listarExamHoyPatologia = (req, res) => {
+    var fechaHoy=req.body.fechaHoy;
     req.getConnection((err, conn) => {
-        conn.query('select * from LISTA_HOY_EXAMEN_DE_PATOLOGIA', (err, result) => {
+        conn.query('call LISTA_HOY_EXAMEN_DE_PATOLOGIA(?)',[fechaHoy], (err, result,fields) => {
             if (err) { res.json(err) };
-            res.json(result);
+            res.json(result[0]);
+            return;
         });
     });
 };
@@ -223,9 +241,10 @@ api.listarExamHoyPatologia = (req, res) => {
 
 api.listarExamPendientesPatologia = (req, res) => {
     req.getConnection((err, conn) => {
-        conn.query('select * from LISTA_PENDIENTES_EXAMEN_DE_PATOLOGIA;', (err, result) => {
+        conn.query('select * from LISTA_PENDIENTES_EXAMEN_DE_PATOLOGIA', (err, result) => {
             if (err) { res.json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -238,6 +257,7 @@ api.listarRoles = (req, res) => {
         conn.query('call SOCKET_OBTENER_USUARIO_ROL(?)', [idusuario], (err, result) => {
             if (err) { res.json(err) };
             res.json(result);
+            return;
         });
     });
 };
@@ -250,8 +270,10 @@ api.saveRoles = (req, res) => {
 
             if (err) {
                 respuesta.status(400).json(err)
+                 return;
             } else {
                 res.json({ mensaje: 'Registro Exitoso' });
+                return;
             }
         });
     });
@@ -260,13 +282,17 @@ api.saveRoles = (req, res) => {
 api.saveMuestra = (req, res) => {
 
     var descripcion = req.body.descripcion;
+    var idTipoMuestraPat=req.body.idTipoMuestraPat;
+
     req.getConnection((err, conn) => {
-        conn.query('call  INSERTAR_MUESTRA(?)', [descripcion], (err, result, fields) => {
+        conn.query('call INSERTAR_MUESTRA_PATOLOGIA(?,?)', [idTipoMuestraPat, descripcion], (err, result, fields) => {
 
             if (err) {
                 respuesta.status(400).json(err)
+                return;
             } else {
                 res.json({ mensaje: 'Registro Exitoso' });
+                return;
             }
         });
     });
@@ -294,25 +320,28 @@ function modificarPatologia(body,iteracion,peticion,respuesta){
         var fechaAtencion=body.examenes[iteracion-1].atendido? fechaRegistroExamen: null; 
         var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado; 
         var cantidad=body.examenes[iteracion-1].cantidad; 
-        var fechaEnvioMuestra=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null; 
+        var fechaEnvioMuestra=body.examenes[iteracion-1].fechaEnvio ===''? null: body.examenes[iteracion-1].fechaEnvio; 
+        var estadoEnvio=body.examenes[iteracion-1].enviado;
         var estadoPago=body.examenes[iteracion-1].pagado;
         var idMuestraPat=body.examenes[iteracion-1].id;
         var idPaciente=body.examenes[iteracion-1].idPaciente;
         var idUsuario=peticion.usuario.idUsuario;  
          
     peticion.getConnection((err, conn) => {
-        conn.query('CALL MODIFICAR_PACIENTE_EXAMEN_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
+        conn.query('CALL MODIFICAR_PACIENTE_EXAMEN_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
                      [dni,nombres, apellidos,fechaNacimiento,telefono,empresa,doExamen,idExamen, 
                      fechaRegistroExamen, fechaAtencion,fechaEntregaResultado,
-                     cantidad,fechaEnvioMuestra,estadoPago,idMuestraPat,
+                     cantidad,fechaEnvioMuestra,estadoPago,estadoEnvio,idMuestraPat,
                      idPaciente,idUsuario], (err, result, fields) => {
 
             if (err) {
                 respuesta.status(400).json(err)
+                return;
             } else {
                 iteracion--;
                 if(iteracion<1){
                 respuesta.json({ mensaje: 'Registro Exitoso' });
+                return;
                 }else{
                     modificarPatologia(body,iteracion,peticion,respuesta);
                 }
@@ -331,21 +360,23 @@ api.modificarUnSoloExamPatologia = (req, res) => {
     var idExamen=req.body.idExamen; 
     var fechaAtencion=req.body.atendido;
     var fechaEntregaResultado=req.body.fechaResultado==''? null: req.body.fechaResultado; 
+    var fechaEnvioMuestra=req.body.fechaEnvio==''? null: req.body.fechaEnvio; 
     var cantidad=req.body.cantidad; 
-    var fechaEnvioMuestra=req.body.enviado; 
+    var estadoEnvio=req.body.enviado; 
     var estadoPago=req.body.pagado;
      
     req.getConnection((err, conn) => {
-                conn.query('CALL MOD_UN_EXAMEN_DE_PATOLOGIA_PAMS(?,?,?,?,?,?,?) ',
+                conn.query('CALL MOD_UN_EXAMEN_DE_PATOLOGIA_PAMS(?,?,?,?,?,?,?,?) ',
                             [idExamen, fechaAtencion,fechaEntregaResultado,
-                            cantidad,fechaEnvioMuestra,estadoPago,idUsuario], (err, result, fields) => {
+                            cantidad,fechaEnvioMuestra,estadoPago,estadoEnvio,idUsuario], (err, result, fields) => {
 
                     if (err) {
                         res.status(400).json(err)
+                        return;
                     } else {
                       
                         res.json({ mensaje: 'Registro Exitoso' });
-                       
+                        return;
                     
                     }
                 });
@@ -361,8 +392,8 @@ api.saveExamPatologia = (req, res) => {
         SavePatologia(req.body,iteracion,req,res)
     }
     function SavePatologia(body,iteracion,peticion,respuesta){
-        var dni=peticion.body.dni;
-        var nombres=peticion.body.nombres;
+        var dni=body.dni;
+        var nombres=body.nombres;
         var apellidos=body.apellidos
         var fechaNacimiento=body.fechaNacimiento;
         var telefono=body.telefono;
@@ -371,23 +402,26 @@ api.saveExamPatologia = (req, res) => {
         var fechaAtencion=body.examenes[iteracion-1].atendido? fechaRegistroExamen: null; 
         var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado; 
         var cantidad=body.examenes[iteracion-1].cantidad; 
-        var fechaEnvioMuestra=body.examenes[iteracion-1].enviado? fechaRegistroExamen:null; 
+        var fechaEnvioMuestra=body.examenes[iteracion-1].fechaEnvioMuestra ===''? null: body.examenes[iteracion-1].fechaEnvioMuestra; 
+        var estadoEnvio=body.examenes[iteracion-1].enviado;
         var estadoPago=body.examenes[iteracion-1].pagado;
         var idMuestraPat=body.examenes[iteracion-1].id;
         var idUsuario=peticion.usuario.idUsuario;  
     
         peticion.getConnection((err, conn) => {
-            conn.query('CALL INSERTAR_EXAMEN_DE_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
+            conn.query('CALL INSERTAR_EXAMEN_DE_PATOLOGIA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ',
                          [nombres, apellidos,fechaNacimiento,telefono,dni,empresa,fechaRegistroExamen
-                            ,fechaAtencion,fechaEntregaResultado,cantidad,fechaEnvioMuestra,estadoPago,idMuestraPat,idUsuario], (err, result, fields) => {
+                            ,fechaAtencion,fechaEntregaResultado,cantidad,fechaEnvioMuestra,estadoEnvio,estadoPago,idMuestraPat,idUsuario], (err, result, fields) => {
     
                 if (err) {
-                    console.log(err)
+                    // console.log(err)
                     respuesta.status(400).json(err)
+                    return;
                 } else {
                     iteracion--;
                     if(iteracion<1){
                     respuesta.json({ mensaje: 'Registro Exitoso' });
+                    return;
                     }else{
                         SavePatologia(body,iteracion,peticion,respuesta);
                     }
@@ -443,6 +477,7 @@ api.saveUsers = (req, res) => {
                 err
             });
             console.log('Conexion');
+            return;
         }
         conn.query('CALL INSERTAR_USUARIO(?,?,?)', [user, email, pass], (err, result) => {
             if (err) {
@@ -450,6 +485,7 @@ api.saveUsers = (req, res) => {
                     mensaje: 'Ocurrio un error',
                     err
                 });
+                return;
             } else {
                 if (result[0][0].total) {
                     var total = result[0][0].total;
@@ -457,6 +493,7 @@ api.saveUsers = (req, res) => {
                     //io.sockets.emit('notificacion:regUsuario',result);
                     total > 0 ? res.json({ mensaje: 'Registro Exitoso' }) : res.status(500).json({ mensaje: 'No se registro' });
                 }
+                return;
             }
         });
     })
@@ -471,6 +508,7 @@ api.login = (req, res) => {
             res.status(500).json({
                 mensaje: 'Ocurrio en conexión',
             });
+            return;
         }
 
         conn.query('call LOGIN(?)', [email], (err, result) => {
@@ -479,16 +517,17 @@ api.login = (req, res) => {
                     mensaje: 'Ocurrio un error',
                     err
                 });
+                return;
             }
             else if (!result[0].length) {
                 res.status(400).json({
                     mensaje: 'Usuario no valido'
                 });
+                return;
             } else {
 
                 var dato = result[0][0];
                 var password = dato.pass;
-
 
                 if (!bcrypt.compareSync(pass, password)) {
 
@@ -496,6 +535,7 @@ api.login = (req, res) => {
                         mensaje: 'Error en sus credenciales',
                         err
                     });
+                    return;
 
                 } else {
                     var usuario = {
@@ -512,6 +552,7 @@ api.login = (req, res) => {
                         usuario,
                         token: token
                     });
+                    return;
                 }
             }
         });
@@ -534,27 +575,49 @@ api.saveResultadoPDF = (req, res) => {
     req.getConnection((err, conn) => {
         conn.query('CALL INSERTAR_RESULTADO_EXAMEN_PATOLOGIA(?,?,?,?,?,?,?,?)',
         [fechaInforme,horaInforme,descripcion,nivelUrgencia,pdf,namepdf,idExamen,idUsuario], (err, result) => {
-            if (err) { res.status(400).json(err) };
+            if (err) { res.status(400).json(err)
+                return;
+            };
             res.json(result);
-        });
-    });
-};
-
-api.listarExamPendientesLabChincha = (req, res) => { 
-    req.getConnection((err, conn) => {
-        conn.query('select * from LISTA_PENDIENTE_DE_RESULTADO_PATOLOGIA_PAMS', (err, result) => {
-            if (err) { res.status(400).json(err) };
-            res.json(result);
+            return;
         });
     });
 };
 
 api.listarExamPendientesLabLima = (req, res) => { 
+    req.getConnection((err, conn) => {
+        conn.query('select * from LISTA_PENDIENTE_DE_RESULTADO_PATOLOGIA_PAMS', (err, result) => {
+            if (err) {
+             res.status(400).json(err)
+             return;
+            };
+            res.json(result);
+            return;
+        });
+    });
+};
+
+api.listarExamPendientesLabChincha = (req, res) => { 
 
     req.getConnection((err, conn) => {
         conn.query('select * from LISTA_PENDIENTE_DE_RESULTADO_LABORATORIO_PAMS', (err, result) => {
-            if (err) { res.status(400).json(err) };
+            if (err) { res.status(400).json(err)   
+                return;};
             res.json(result);
+            return;
+        });
+    });
+};
+
+api.listaCompletaDePendientesAdmision = (req, res) => { 
+
+    req.getConnection((err, conn) => {
+        conn.query(`SELECT * from LISTA_COMPLETA_DE_RESULTADOS_PENDIENTES_PARA_ADMISION`, 
+         (err, result) => {
+            if (err) { res.status(400).json(err)
+                return; };
+            res.json(result);
+            return;
         });
     });
 };
@@ -564,9 +627,11 @@ api.listarAdmisionExamLaboratorio = (req, res) => {
     req.getConnection((err, conn) => {
         conn.query("select * from LISTA_PENDIENTE_PARA_ADMISION_DE_RESULTADO_LABORATORIO  l Left Join resultadoExamen res "+
         "on res.idExamen=l.idExamen where res.visibilidad = true or res.visibilidad is null ;", 
-        (err, result) => {
-            if (err) { res.status(400).json(err) };
+         (err, result) => {
+            if (err) { res.status(400).json(err)
+                return; };
             res.json(result);
+            return;
         });
     });
 };
@@ -576,8 +641,10 @@ api.listarAdmisionExamPatologia = (req, res) => {
         conn.query("select * from LISTA_PENDIENTE_PARA_ADMISION_DE_RESULTADO_PATOLOGIA  l "+
         "Left Join resultadoExamen res on res.idExamen=l.idExamen where res.visibilidad = true or res.visibilidad is null ",
          (err, result) => {
-            if (err) { res.status(400).json(err) };
+            if (err) { res.status(400).json(err)
+                return; };
             res.json(result);
+            return;
         });
     });
 };
@@ -586,8 +653,10 @@ api.listarResultados = (req, res) => {
         req.getConnection((err, conn) => {
             conn.query("SELECT * FROM LISTAR_RESULTADO_EXAMENES_VISIBLES",
             (err, result) => {
-                if (err) { res.status(400).json(err) };
+                if (err) { res.status(400).json(err) 
+                    return;};
                 res.json(result);
+                return;
             });
         });
 };
@@ -597,10 +666,11 @@ api.cambiarVisibilidadResultado = (req, res) => {
     req.getConnection((err, conn) => {
         conn.query("update resultadoExamen set visibilidad=false where idExamen=?",[idExamen],
          (err, result) => {
-            if (err) { res.status(400).json(err) };
-           
+            if (err) { res.status(400).json(err)
+                return; };
             res.json(result);
-        });
+          return;
+         });
     });
 };
 
@@ -610,10 +680,13 @@ api.getFile = (req, res) => {
 
     req.getConnection((err, conn) => {
         conn.query('select pdf , namepdf from resultadoExamen where idResultado = ?',[idResultado], (err, result) => {
-            if (err)
+            if (err){
                 res.status(500).json({ mensaje: 'Error en consulta'})
+                return;
+            }
             else{
                 res.json(result[0]);
+                return;
             }
             
         })
