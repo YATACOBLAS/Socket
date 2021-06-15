@@ -306,7 +306,7 @@ api.modificarExamPatologia = (req, res) => {
  modificarPatologia(req.body,iteracion,req,res)
 }
 function modificarPatologia(body,iteracion,peticion,respuesta){
-
+  
         var dni=body.dni;
         var nombres=body.nombres;
         var apellidos=body.apellidos
