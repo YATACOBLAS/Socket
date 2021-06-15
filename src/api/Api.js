@@ -513,6 +513,7 @@ api.login = (req, res) => {
 
         conn.query('call LOGIN(?)', [email], (err, result) => {
             if (err) {
+                
                 res.status(500).json({
                     mensaje: 'Ocurrio un error',
                     err
@@ -530,7 +531,7 @@ api.login = (req, res) => {
                 var password = dato.pass;
 
                 if (!bcrypt.compareSync(pass, password)) {
-
+                    
                     res.status(500).json({
                         mensaje: 'Error en sus credenciales',
                         err
