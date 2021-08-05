@@ -3,6 +3,11 @@ const path= require('path');
 const mysql =require('mysql');
 const cors =require('cors');
 const myConnection = require('express-myconnection');
+
+
+//Los atacantes pueden utilizar esta cabecera (que está habilitada de forma predeterminada) 
+//para detectar las aplicaciones que ejecutan Express e iniciar ataques con destinos específicos.
+
 var corsOptions = {
     origin: 'http://example.com',
     optionsSuccessStatus: 200 

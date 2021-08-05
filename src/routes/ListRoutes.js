@@ -3,8 +3,12 @@ const router= express.Router();
 const api= require('../api/Api.js');
 const multer = require('multer');
 
+
+
+
 const {verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams,
-    verificarRolLaboratorioTercerizado,verificarRolAdmision}= require('../middleware/autenticacion')
+    verificarRolLaboratorioTercerizado,verificarRolAdmision,verificarRolImagenes}= require('../middleware/autenticacion')
+
 
 router.get('/listarEmpresa', api.listarEmpresa);
 //por el momento nadie lo usa se3ra quitado si no tiene uso
@@ -42,14 +46,27 @@ router.get('/listarExamPendientesLaboratorio', api.listarExamPendientesLaborator
 router.post('/saveExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], api.saveExamLaboratorio);
 router.post('/modificarExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], api.modificarExamLaboratorio);
 router.post('/modificarUnSoloExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], api.modificarUnSoloExamLaboratorio);
-//LaboratorioTercerizado
-router.post('/saveResultadoPDF',[verificarAuth,verificarRolLaboratorioTercerizado],(multer().single("file")), api.saveResultadoPDF);
+//LaboratorioTercerizadoChincha
+router.post('/guardarResultadoPDF',[verificarAuth,verificarRolLaboratorioTercerizado],(multer().single("file")), api.guardarResultadoPDF);
 //LaboratorioTercerizadoChincha
 router.get('/listarExamPendientesLabLima',[verificarAuth,verificarRolLaboratorioTercerizado], api.listarExamPendientesLabLima);
 //LaboratorioTercerizadoLima
 router.get('/listarExamPendientesLabChincha',[verificarAuth,verificarRolLaboratorioTercerizado], api.listarExamPendientesLabChincha);
 
 //Imagenes
+router.get('/listarEspecialidad',api.listarEspecialidad);
+router.get('/listarTipoMuestraImagen',api.listarTipoMuestraImagen);
+router.get('/listarMuestraImagen',api.listarMuestraImagen);
+router.get('/listarTipoPlaca',api.listarTipoPlaca);
+router.get('/listarTipoAtencion',api.listarTipoAtencion);
+router.get('/listarRolMedico',api.listarRolMedico);
+router.get('/listarMedico',api.listarMedico);
+router.get('/listarEspecialidad',api.listarEspecialidad);
+
+router.post('/guardarExamImagenes',[verificarAuth,verificarRolImagenes], api.guardarExamImagenes);
+//router.post('/modificarExamImagenes',[verificarAuth,verificarRolImagenes], api.modificarExamImagenes);
+
+
 
 //Admision
 router.get('/listaCompletaDePendientesAdmision',[verificarAuth,verificarRolAdmision], api.listaCompletaDePendientesAdmision);

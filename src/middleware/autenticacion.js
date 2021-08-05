@@ -73,6 +73,22 @@ const verificarRolLaboratorioTercerizado=(req,res,next)=>{
     
 }
 
+const verificarRolImagenes=(req,res,next)=>{
+
+    const rol =req.usuario.rol
+
+    if(rol=='administrador' || rol=='imagen' ){
+       
+        next();
+      }else{    
+            res.status(401).json({
+                mensaje: 'Usuario no valido'
+            });
+     
+    }
+    
+}
+
 
 const verificarRolAdmision=(req,res,next)=>{
 
@@ -91,4 +107,5 @@ const verificarRolAdmision=(req,res,next)=>{
 }
 
 
-module.exports ={verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams,verificarRolLaboratorioTercerizado,verificarRolAdmision};
+module.exports ={verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams,
+    verificarRolLaboratorioTercerizado,verificarRolAdmision,verificarRolImagenes};

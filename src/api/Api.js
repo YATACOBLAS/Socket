@@ -204,7 +204,6 @@ api.saveExamLaboratorio = (req, res) => {
 
 
 
-
 api.listarTipoMuestraPat= (req, res) => {
     req.getConnection((err, conn) => {
         conn.query('select * from tipoMuestraPat', (err, result) => {
@@ -230,9 +229,9 @@ api.listarMuestraPat = (req, res) => {
 api.listarExamHoyPatologia = (req, res) => {
     var fechaHoy=req.body.fechaHoy;
     req.getConnection((err, conn) => {
-        conn.query('call LISTA_HOY_EXAMEN_DE_PATOLOGIA(?)',[fechaHoy], (err, result,fields) => {
+        conn.query('select * from LISTA_HOY_EXAMEN_DE_PATOLOGIA',[fechaHoy], (err, result,fields) => {
             if (err) { res.json(err) };
-            res.json(result[0]);
+            res.json(result);
             return;
         });
     });
@@ -313,16 +312,16 @@ function modificarPatologia(body,iteracion,peticion,respuesta){
         var fechaNacimiento=body.fechaNacimiento;
         var telefono=body.telefono;
         var empresa=body.empresa;
-             var stringDoExamen=body.examenes[iteracion-1].doExamen;
-        var doExamen=(stringDoExamen=='Modificar'? 1:(stringDoExamen=='Nuevo'? 0 : -1 )) ; 
+        var stringDoExamen=body.examenes[iteracion-1].doExamen;
+        var doExamen=stringDoExamen=='Modificar'? 1:(stringDoExamen=='Nuevo'? 0 : -1 ); 
+        var estadoPago=body.examenes[iteracion-1].pagado;
         var idExamen=body.examenes[iteracion-1].idExamen; 
         var fechaRegistroExamen=body.fechaRegistroExamen; 
         var fechaAtencion=body.examenes[iteracion-1].atendido? fechaRegistroExamen: null; 
-        var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado; 
+        var fechaEntregaResultado=estadoPago? (body.examenes[iteracion-1].fechaResultado ===''? null: body.examenes[iteracion-1].fechaResultado):null; 
         var cantidad=body.examenes[iteracion-1].cantidad; 
-        var fechaEnvioMuestra=body.examenes[iteracion-1].fechaEnvio ===''? null: body.examenes[iteracion-1].fechaEnvio; 
-        var estadoEnvio=body.examenes[iteracion-1].enviado;
-        var estadoPago=body.examenes[iteracion-1].pagado;
+        var fechaEnvioMuestra=estadoPago? (body.examenes[iteracion-1].fechaEnvio ===''? null: body.examenes[iteracion-1].fechaEnvio):null; 
+        var estadoEnvio=estadoPago? body.examenes[iteracion-1].enviado:false;        
         var idMuestraPat=body.examenes[iteracion-1].id;
         var idPaciente=body.examenes[iteracion-1].idPaciente;
         var idUsuario=peticion.usuario.idUsuario;  
@@ -391,7 +390,7 @@ api.saveExamPatologia = (req, res) => {
         var iteracion= req.body.examenes.length;
         SavePatologia(req.body,iteracion,req,res)
     }
-    function SavePatologia(body,iteracion,peticion,respuesta){
+    SavePatologia=(body,iteracion,peticion,respuesta)=>{
         var dni=body.dni;
         var nombres=body.nombres;
         var apellidos=body.apellidos
@@ -433,6 +432,174 @@ api.saveExamPatologia = (req, res) => {
     }
 
 
+     // // // // // // // // // // // // // // //
+     // // // // // IMAGENES  // // // // // // // 
+     // // // // // // // // // // // // // // //
+
+     api.listarEspecialidad=(req,res)=>{
+       
+        req.getConnection((err, conn) => {
+            conn.query('select * from especialidad', (err, result) => {
+                if (err) { res.json(err) };
+                res.json(result);
+                return;
+            });
+        });
+     };
+
+     api.listarTipoMuestraImagen=(req,res)=>{
+
+        req.getConnection((err, conn) => {
+            conn.query('select * from tipoMuestraImagen', (err, result) => {
+                if (err) { res.json(err) };
+                res.json(result);
+                return;
+            });
+        });
+     };
+
+     api.listarMuestraImagen=(req,res)=>{
+
+        var idTipoMuestraImagen=req.body.idTipoMuestraImagen;
+        req.getConnection((err, conn) => {
+            conn.query('select * from muestraImagen where idTipoMuestraImagen=?',[idTipoMuestraImagen], (err, result) => {
+                if (err) { res.json(err) };
+                res.json(result);
+                return;
+            });
+        });
+     };
+
+     api.listarTipoPlaca=(req,res)=>{
+        req.getConnection((err, conn) => {
+            conn.query('select * from tipoPlaca ', (err, result) => {
+                if (err) { res.json(err) };
+                res.json(result);
+                return;
+            });
+        });
+     };
+
+
+     api.listarTipoAtencion=(req,res)=>{
+        req.getConnection((err, conn) => {
+            conn.query('select * from tipoAtencion', (err, result) => {
+                if (err) { res.json(err) };
+                res.json(result);
+                return;
+            });
+        });
+     };
+
+
+     api.listarRolMedico=(req,res)=>{
+        req.getConnection((err, conn) => {
+            conn.query('select * from rolMedico ', (err, result) => {
+                if (err) { res.json(err) };
+                res.json(result);
+                return;
+            });
+        });
+     };
+
+     api.listarMedico=(req,res)=>{
+        req.getConnection((err, conn) => {
+            conn.query('select * from Medico', (err, result) => {
+                if (err) { res.json(err) };
+                res.json(result);
+                return;
+            });
+        });
+     };
+
+   api.guardarExamImagenes= (req,res)=>{
+        var iteracion= req.body.examenes.length;
+        var dni=req.body.dni;
+        var nombres=req.body.nombres;
+        var apellidos=req.body.apellidos
+        var fechaNacimiento=req.body.fechaNacimiento;
+        var telefono=req.body.telefono;
+        var empresa=req.body.empresa;
+        req.getConnection((err,conn)=>{
+            conn.query('CALL INSERTAR_PACIENTE(?,?,?,?,?,?)',[dni,nombres,apellidos,fechaNacimiento,telefono,empresa],(err,result,field)=>{
+                if(err){
+                    res.status(400).json(err);
+                    return;
+                }
+                req.body.idPaciente=result[0][0].COMMIT;
+                if(req.body.idPaciente){              
+                    guardarImagenes(req.body,iteracion,req,res,conn);          
+                }
+            })
+        })
+  
+   }
+
+    guardarImagenes=(body,iteracion,req,res,conexion)=>{
+
+        var idPaciente= body.idPaciente;
+        var fechaRegistroExamen=body.examenes[iteracion-1].fechaRegistroExamen; 
+        var fechaAtencion=body.examenes[iteracion-1].fechaAtencion; 
+        var fechaEntregaResultado=body.examenes[iteracion-1].fechaResultado; 
+        var nroVoucher= body.examenes[iteracion-1].nroVoucher; 
+        var importe=body.examenes[iteracion-1].importe;
+        var archivo=body.examenes[iteracion-1].archivo;
+        var idTipoAtencion=body.examenes[iteracion-1].idTipoAtencion;
+        var idMuestraImagen=body.examenes[iteracion-1].idMuestraImagen;
+        var idTipoPlaca=body.examenes[iteracion-1].idTipoPlaca;
+        var nroFallas=body.examenes[iteracion-1].nroFallas;
+        var detalleRolMedico=body.examenes[iteracion-1].detalleRolMedico;
+        var idUsuario=req.usuario.idUsuario;  
+
+       
+            conexion.query('CALL INSERTAR_EXAMEN_IMAGENES(?,?,?,?,?,?,?,?,?,?,?,?)',
+                        [ idPaciente,fechaRegistroExamen,fechaAtencion,fechaEntregaResultado,
+                          nroVoucher, importe, archivo, 
+                         idTipoAtencion,idMuestraImagen,idTipoPlaca,nroFallas,idUsuario], (err, result, fields) => {
+
+                if (err) {
+                    // console.log(err)
+                    res.status(400).json(err)
+                    return;
+                } else {
+                    // Registramos el detalleRolMedico
+                    console.log(result[0][0]._IdImagen);
+                    var idImagen=result[0][0]._IdImagen;
+                    var iterarDetalle=2;
+                             
+                        do {
+                            guardarDetalleRolMedico(detalleRolMedico,res,conexion,idImagen,iterarDetalle)
+                            iterarDetalle--;
+                        } while (iterarDetalle==0);
+
+                    iteracion--;
+                    if(iteracion<1){
+                            res.json({ mensaje: 'Registro Exitoso' });
+                            return;
+                    }else{
+                        guardarImagenes(body,iteracion,req,res,conexion);
+                    }
+                
+                }
+            });
+   }
+
+
+   
+   guardarDetalleRolMedico=(detalleRolMedico,res,conexion,idImagen,iterarDetalle)=>{
+    var idMedico=detalleRolMedico[iterarDetalle-1].idMedico;
+    var idRolMedico=detalleRolMedico[iterarDetalle-1].idRolMedico;
+
+        conexion.query('call INSERTAR_DETALLE_ROLMEDICO(?,?,?)',[idImagen,idRolMedico,idMedico],(err,result)=>{
+            if(err){
+                res.status(400).json(err)
+                return;
+            }
+                return;
+        
+        })
+    
+    };
 
 /*
 
@@ -561,7 +728,7 @@ api.login = (req, res) => {
 };
 
 //PDF CHINCHA
-api.saveResultadoPDF = (req, res) => {    
+api.guardarResultadoPDF = (req, res) => {    
     // console.log("descripcion: ",req.file);
     // console.log("buffer:", req.file.buffer);
     // console.log("buffer-Length:", (req.file.buffer).length);
@@ -571,11 +738,11 @@ api.saveResultadoPDF = (req, res) => {
     var descripcion = req.body.descripcion;
     var nivelUrgencia=req.body.nivelUrgencia;
     var pdf=req.file.buffer;
-    var namepdf=req.file.originalname;
+    var nombrePdf=req.file.originalname;
     var idUsuario=req.usuario.idUsuario;  
     req.getConnection((err, conn) => {
-        conn.query('CALL INSERTAR_RESULTADO_EXAMEN_PATOLOGIA(?,?,?,?,?,?,?,?)',
-        [fechaInforme,horaInforme,descripcion,nivelUrgencia,pdf,namepdf,idExamen,idUsuario], (err, result) => {
+        conn.query('CALL INSERTAR_RESULTADO_EXAMEN_LABORATORIO_Y_PATOLOGIA(?,?,?,?,?,?,?,?)',
+        [fechaInforme,horaInforme,descripcion,nivelUrgencia,pdf,nombrePdf,idExamen,idUsuario], (err, result) => {
             if (err) { res.status(400).json(err)
                 return;
             };
@@ -608,6 +775,7 @@ api.listarExamPendientesLabChincha = (req, res) => {
             return;
         });
     });
+
 };
 
 api.listaCompletaDePendientesAdmision = (req, res) => { 
@@ -627,7 +795,7 @@ api.listarAdmisionExamLaboratorio = (req, res) => {
 
     req.getConnection((err, conn) => {
         conn.query("select * from LISTA_PENDIENTE_PARA_ADMISION_DE_RESULTADO_LABORATORIO  l Left Join resultadoExamen res "+
-        "on res.idExamen=l.idExamen where res.visibilidad = true or res.visibilidad is null ;", 
+        "on res.idExamen=l.idExamen where res.estado = true or res.estado is null ;", 
          (err, result) => {
             if (err) { res.status(400).json(err)
                 return; };
@@ -640,7 +808,7 @@ api.listarAdmisionExamLaboratorio = (req, res) => {
 api.listarAdmisionExamPatologia = (req, res) => { 
     req.getConnection((err, conn) => {
         conn.query("select * from LISTA_PENDIENTE_PARA_ADMISION_DE_RESULTADO_PATOLOGIA  l "+
-        "Left Join resultadoExamen res on res.idExamen=l.idExamen where res.visibilidad = true or res.visibilidad is null ",
+        "Left Join resultadoExamen res on res.idExamen=l.idExamen where res.estado = true or res.estado is null ",
          (err, result) => {
             if (err) { res.status(400).json(err)
                 return; };
@@ -652,7 +820,7 @@ api.listarAdmisionExamPatologia = (req, res) => {
 
 api.listarResultados = (req, res) => { 
         req.getConnection((err, conn) => {
-            conn.query("SELECT * FROM LISTAR_RESULTADO_EXAMENES_VISIBLES",
+            conn.query("SELECT * FROM LISTAR_RESULTADO_EXAMENES_VISIBLES_PARA_ADMISION",
             (err, result) => {
                 if (err) { res.status(400).json(err) 
                     return;};
@@ -665,7 +833,7 @@ api.listarResultados = (req, res) => {
 api.cambiarVisibilidadResultado = (req, res) => { 
     var idExamen=req.body.idExamen;
     req.getConnection((err, conn) => {
-        conn.query("update resultadoExamen set visibilidad=false where idExamen=?",[idExamen],
+        conn.query("update resultadoExamen set estado=false where idExamen=?",[idExamen],
          (err, result) => {
             if (err) { res.status(400).json(err)
                 return; };
@@ -680,7 +848,7 @@ api.getFile = (req, res) => {
     var idResultado=req.body.id;
 
     req.getConnection((err, conn) => {
-        conn.query('select pdf , namepdf from resultadoExamen where idResultado = ?',[idResultado], (err, result) => {
+        conn.query('select pdf,nombrePdf from resultadoExamen where idResultado = ?',[idResultado], (err, result) => {
             if (err){
                 res.status(500).json({ mensaje: 'Error en consulta'})
                 return;
