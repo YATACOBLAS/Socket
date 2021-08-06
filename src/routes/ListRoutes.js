@@ -1,13 +1,18 @@
 const express =require('express');
 const router= express.Router();
 const api= require('../api/Api.js');
+const apiLaboratorio =require('../api/Api_Laboratorio.js');
+const apiPatologia = require('../api/Api_Patologia.js');
+const apiImagenes = require('../api/Api_Imagenes.js');
+const apiTercerizado=require('../api/Api_Tercerizado');
 const multer = require('multer');
 
 
 
 
 const {verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams,
-    verificarRolLaboratorioTercerizado,verificarRolAdmision,verificarRolImagenes}= require('../middleware/autenticacion')
+    verificarRolLaboratorioTercerizado,verificarRolAdmision,verificarRolImagenes}= require('../middleware/autenticacion');
+
 
 
 router.get('/listarEmpresa', api.listarEmpresa);
@@ -28,43 +33,43 @@ router.post('/saveRoles',[verificarAuth,verificarRolAdmin], api.saveRoles);
 router.post('/saveMuestra', api.saveMuestra);
 
 //Patologia
-router.get('/listarTipoMuestraPat', api.listarTipoMuestraPat);
-router.get('/listarMuestraPat/:idMuestra', api.listarMuestraPat);
-router.post('/listarExamHoyPatologia',[verificarAuth,verificarRolPatologia], api.listarExamHoyPatologia);
+router.get('/listarTipoMuestraPat', apiPatologia.listarTipoMuestraPat);
+router.get('/listarMuestraPat/:idMuestra', apiPatologia.listarMuestraPat);
+router.post('/listarExamHoyPatologia',[verificarAuth,verificarRolPatologia], apiPatologia.listarExamHoyPatologia);
                     
-router.get('/listarExamPendientesPatologia', api.listarExamPendientesPatologia);
-router.post('/saveExamPatologia',[verificarAuth,verificarRolPatologia], api.saveExamPatologia);
-router.post('/modificarExamPatologia',[verificarAuth,verificarRolPatologia], api.modificarExamPatologia);
-router.post('/modificarUnSoloExamPatologia',[verificarAuth,verificarRolPatologia], api.modificarUnSoloExamPatologia);
+router.get('/listarExamPendientesPatologia', apiPatologia.listarExamPendientesPatologia);
+router.post('/saveExamPatologia',[verificarAuth,verificarRolPatologia], apiPatologia.saveExamPatologia);
+router.post('/modificarExamPatologia',[verificarAuth,verificarRolPatologia], apiPatologia.modificarExamPatologia);
+router.post('/modificarUnSoloExamPatologia',[verificarAuth,verificarRolPatologia], apiPatologia.modificarUnSoloExamPatologia);
 
 //LaboratorioClinicoPams
-router.get('/listarTipoMuestraLab', api.listarTipoMuestraLab);
-router.get('/listarMuestraLab/:idMuestra', api.listarMuestraLab);
-router.get('/listarExamHoyLaboratorio', api.listarExamHoyLaboratorio);
+router.get('/listarTipoMuestraLab', apiLaboratorio.listarTipoMuestraLab);
+router.get('/listarMuestraLab/:idMuestra', apiLaboratorio.listarMuestraLab);
+router.get('/listarExamHoyLaboratorio', apiLaboratorio.listarExamHoyLaboratorio);
+router.get('/listarExamPendientesLaboratorio', apiLaboratorio.listarExamPendientesLaboratorio);
 
-router.get('/listarExamPendientesLaboratorio', api.listarExamPendientesLaboratorio);
-router.post('/saveExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], api.saveExamLaboratorio);
-router.post('/modificarExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], api.modificarExamLaboratorio);
-router.post('/modificarUnSoloExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], api.modificarUnSoloExamLaboratorio);
-//LaboratorioTercerizadoChincha
-router.post('/guardarResultadoPDF',[verificarAuth,verificarRolLaboratorioTercerizado],(multer().single("file")), api.guardarResultadoPDF);
-//LaboratorioTercerizadoChincha
-router.get('/listarExamPendientesLabLima',[verificarAuth,verificarRolLaboratorioTercerizado], api.listarExamPendientesLabLima);
+router.post('/saveExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], apiLaboratorio.saveExamLaboratorio);
+router.post('/modificarExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], apiLaboratorio.modificarExamLaboratorio);
+router.post('/modificarUnSoloExamLaboratorio',[verificarAuth,verificarRolLaboratorioPams], apiLaboratorio.modificarUnSoloExamLaboratorio);
+//LaboratorioTercerizadoAmbos
+router.post('/guardarResultadoPDF',[verificarAuth,verificarRolLaboratorioTercerizado],(multer().single("file")), apiTercerizado.guardarResultadoPDF);
 //LaboratorioTercerizadoLima
-router.get('/listarExamPendientesLabChincha',[verificarAuth,verificarRolLaboratorioTercerizado], api.listarExamPendientesLabChincha);
+router.get('/listarExamPendientesLabLima',[verificarAuth,verificarRolLaboratorioTercerizado], apiTercerizado.listarExamPendientesLabLima);
+//LaboratorioTercerizadoChincha
+router.get('/listarExamPendientesLabChincha',[verificarAuth,verificarRolLaboratorioTercerizado], apiTercerizado.listarExamPendientesLabChincha);
 
 //Imagenes
-router.get('/listarEspecialidad',api.listarEspecialidad);
-router.get('/listarTipoMuestraImagen',api.listarTipoMuestraImagen);
-router.get('/listarMuestraImagen',api.listarMuestraImagen);
-router.get('/listarTipoPlaca',api.listarTipoPlaca);
-router.get('/listarTipoAtencion',api.listarTipoAtencion);
-router.get('/listarRolMedico',api.listarRolMedico);
-router.get('/listarMedico',api.listarMedico);
-router.get('/listarEspecialidad',api.listarEspecialidad);
+router.get('/listarEspecialidad',apiImagenes.listarEspecialidad);
+router.get('/listarTipoMuestraImagen',apiImagenes.listarTipoMuestraImagen);
+router.get('/listarMuestraImagen',apiImagenes.listarMuestraImagen);
+router.get('/listarTipoPlaca',apiImagenes.listarTipoPlaca);
+router.get('/listarTipoAtencion',apiImagenes.listarTipoAtencion);
+router.get('/listarRolMedico',apiImagenes.listarRolMedico);
+router.get('/listarMedico',apiImagenes.listarMedico);
+router.get('/listarEspecialidad',apiImagenes.listarEspecialidad);
 
-router.post('/guardarExamImagenes',[verificarAuth,verificarRolImagenes], api.guardarExamImagenes);
-//router.post('/modificarExamImagenes',[verificarAuth,verificarRolImagenes], api.modificarExamImagenes);
+router.post('/guardarExamImagenes',[verificarAuth,verificarRolImagenes], apiImagenes.guardarExamImagenes);
+router.post('/modificarExamImagenes',[verificarAuth,verificarRolImagenes], apiImagenes.modificarExamImagenes);
 
 
 
