@@ -1,6 +1,6 @@
 const apiImagenes={};
-
-
+const fs= require('fs');
+const path=require('path');
      // // // // // // // // // // // // // // //
      // // // // // IMAGENES  // // // // // // // 
      // // // // // // // // // // // // // // //
@@ -9,7 +9,7 @@ const apiImagenes={};
        
         req.getConnection((err, conn) => {
             conn.query('select * from especialidad', (err, result) => {
-                if (err) { res.json(err) };
+                if (err) { res.status(400).json(err) };
                 res.json(result);
                 return;
             });
@@ -20,7 +20,7 @@ const apiImagenes={};
 
         req.getConnection((err, conn) => {
             conn.query('select * from tipoMuestraImagen', (err, result) => {
-                if (err) { res.json(err) };
+                if (err) { res.status(400).json(err) };
                 res.json(result);
                 return;
             });
@@ -28,11 +28,10 @@ const apiImagenes={};
      };
 
     apiImagenes.listarMuestraImagen=(req,res)=>{
-
         var idTipoMuestraImagen=req.body.idTipoMuestraImagen;
         req.getConnection((err, conn) => {
             conn.query('select * from muestraImagen where idTipoMuestraImagen=?',[idTipoMuestraImagen], (err, result) => {
-                if (err) { res.json(err) };
+                if (err) { res.status(400).json(err) };
                 res.json(result);
                 return;
             });
@@ -42,7 +41,7 @@ const apiImagenes={};
     apiImagenes.listarTipoPlaca=(req,res)=>{
         req.getConnection((err, conn) => {
             conn.query('select * from tipoPlaca ', (err, result) => {
-                if (err) { res.json(err) };
+                if (err) { res.status(400).json(err) };
                 res.json(result);
                 return;
             });
@@ -53,7 +52,7 @@ const apiImagenes={};
     apiImagenes.listarTipoAtencion=(req,res)=>{
         req.getConnection((err, conn) => {
             conn.query('select * from tipoAtencion', (err, result) => {
-                if (err) { res.json(err) };
+                if (err) { res.status(400).json(err) };
                 res.json(result);
                 return;
             });
@@ -64,7 +63,7 @@ const apiImagenes={};
     apiImagenes.listarRolMedico=(req,res)=>{
         req.getConnection((err, conn) => {
             conn.query('select * from rolMedico ', (err, result) => {
-                if (err) { res.json(err) };
+                if (err) { res.status(400).json(err) };
                 res.json(result);
                 return;
             });
@@ -73,16 +72,22 @@ const apiImagenes={};
 
      apiImagenes.listarMedico=(req,res)=>{
         req.getConnection((err, conn) => {
-            conn.query('select * from Medico', (err, result) => {
-                if (err) { res.json(err) };
+            conn.query('select * from medico', (err, result) => {
+                if (err) { res.status(400).json(err) };
                 res.json(result);
                 return;
             });
         });
      };
 
-     apiImagenes.guardarExamImagenes= (req,res)=>{
-        var iteracion= req.body.examenes.length;
+     apiImagenes.guardarExamImagenes=(req,res)=>{
+               
+         req.body.examenes=JSON.parse(req.body.examenes);         
+         var iteracion= req.body.examenes.length;
+         for(let i=0; i<iteracion; i++){
+            req.body.examenes[i].archivo=req.files[0].filename;
+         }
+        
         var dni=req.body.dni;
         var nombres=req.body.nombres;
         var apellidos=req.body.apellidos
@@ -93,8 +98,10 @@ const apiImagenes={};
             conn.query('CALL INSERTAR_PACIENTE(?,?,?,?,?,?)',[dni,nombres,apellidos,fechaNacimiento,telefono,empresa],(err,result,field)=>{
                 if(err){
                     res.status(400).json(err);
+                    console.log(err)
                     return;
                 }
+                console.log()
                 req.body.idPaciente=result[0][0].COMMIT;
                 if(req.body.idPaciente){              
                     guardarImagenes(req.body,iteracion,req,res,conn);          
@@ -115,19 +122,20 @@ const apiImagenes={};
         var archivo=body.examenes[iteracion-1].archivo;
         var idTipoAtencion=body.examenes[iteracion-1].idTipoAtencion;
         var idMuestraImagen=body.examenes[iteracion-1].idMuestraImagen;
+        var idEspecialidad=body.examenes[iteracion-1].idEspecialidad;
         var idTipoPlaca=body.examenes[iteracion-1].idTipoPlaca;
         var nroFallas=body.examenes[iteracion-1].nroFallas;
         var detalleRolMedico=body.examenes[iteracion-1].detalleRolMedico;
         var idUsuario=req.usuario.idUsuario;  
 
        
-            conexion.query('CALL INSERTAR_EXAMEN_IMAGENES(?,?,?,?,?,?,?,?,?,?,?,?)',
+            conexion.query('CALL INSERTAR_EXAMEN_IMAGENES(?,?,?,?,?,?,?,?,?,?,?,?,?)',
                         [ idPaciente,fechaRegistroExamen,fechaAtencion,fechaEntregaResultado,
                           nroVoucher, importe, archivo, 
-                         idTipoAtencion,idMuestraImagen,idTipoPlaca,nroFallas,idUsuario], (err, result, fields) => {
+                         idTipoAtencion,idMuestraImagen,idEspecialidad,idTipoPlaca,nroFallas,idUsuario], (err, result, fields) => {
 
                 if (err) {
-                    // console.log(err)
+                    console.log(err)
                     res.status(400).json(err)
                     return;
                 } else {
@@ -161,12 +169,11 @@ const apiImagenes={};
         conexion.query('call CRUD_DETALLE_ROLMEDICO(?,?,?,?,?)',[idImagen,idRolMedico,idMedico,0,null],(err,result)=>{
             if(err){
                 res.status(400).json(err)
+                console.log(err)
                 return;
             }
                 return;
-        
-        })
-    
+         })
     };
 
 
@@ -180,7 +187,6 @@ const apiImagenes={};
     var telefono=req.body.telefono;
     var empresa=req.body.empresa;
     var idPaciente=req.body.idPaciente;
-  
         
     req.getConnection((err, conn) => {
         conn.query('CALL MODIFICAR_PACIENTE_PAMS(?,?,?,?,?,?,?)',
@@ -195,10 +201,7 @@ const apiImagenes={};
                         modificarImagenes(req.body.examenes,req,res,iteracion,conn, result[0][0]._idPaciente);
                     
                     }
-        });
-    });
-
-
+        }); });
 }
 
     modificarImagenes=(examenes,req,res,iteracion,conn,idPaciente)=>{
@@ -217,7 +220,7 @@ const apiImagenes={};
         var nroFallas=examenes[iteracion-1].nroFallas;
         var iteracionDetalleRol=examenes[iteracion-1].detalleRolMedico.length;
         var idUsuario=req.usuario.idUsuario;  
-        conn.query('call MODIFICAR_EXAMEN_IMAGENES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[
+        conn.query('call MODIFICAR_EXAMEN_IMAGENES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[
             opcionExamen,idExamen,fechaRegistroExamen,fechaAtencion,fechaEntregaResultado,nroVoucher,importe,
             archivo,idTipoAtencion,idMuestraImagen,idTipoPlaca,nroFallas,idPaciente,idUsuario
         ],(err,result)=>{
@@ -258,6 +261,34 @@ const apiImagenes={};
 
     }
 
+apiImagenes.listarExamenesImagenes=(req,res)=>{
+    console.log(req.body)   
+    let desde=req.body.desde;
+        let hasta=req.body.hasta;
 
+    req.getConnection((err,conn)=>{
+        if(err){
+           res.status(400).json(err);
+           return}
+        else{
+        conn.query(`CALL LISTAR_EXAMENES_IMAGENES(?,?)`,[desde,hasta],(err,result)=>{
+            if(err){
+                res.status(400).json(err);
+                return}
+            else{
+                // var arrayBuffer='';
+                //  for( let i=0; result.length>i; i=i+2){
+                //         arrayBuffer=fs.readFileSync(path.join(__dirname,`../imagenes/${result[i].archivo}`)); 
+                //         result[i].arrayBuffer=arrayBuffer;
+                // }
+                res.json(result[0]);
+                  return
+                }
+         })
+       
+    }
+ })
+
+}
 
 module.exports = apiImagenes;

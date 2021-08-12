@@ -30,7 +30,7 @@ apiLabTercerizado.listarExamPendientesLabLima = (req, res) => {
 
 //PDF CHINCHA
 apiLabTercerizado.guardarResultadoPDF = (req, res) => {    
-    // console.log("descripcion: ",req.file);
+     console.log("descripcion: ",req.file);
     // console.log("buffer:", req.file.buffer);
     // console.log("buffer-Length:", (req.file.buffer).length);
     var idExamen=req.body.idExamen;
@@ -41,17 +41,18 @@ apiLabTercerizado.guardarResultadoPDF = (req, res) => {
     var pdf=req.file.buffer;
     var nombrePdf=req.file.originalname;
     var idUsuario=req.usuario.idUsuario;  
-    req.getConnection((err, conn) => {
-        conn.query('CALL INSERTAR_RESULTADO_EXAMEN_LABORATORIO_Y_PATOLOGIA(?,?,?,?,?,?,?,?)',
-        [fechaInforme,horaInforme,descripcion,nivelUrgencia,pdf,nombrePdf,idExamen,idUsuario], (err, result) => {
-            if (err) { res.status(400).json(err)
-                return;
-            };
-            res.json(result);
-            return;
-        });
-    });
-};
+    // req.getConnection((err, conn) => {
+    //     conn.query('CALL INSERTAR_RESULTADO_EXAMEN_LABORATORIO_Y_PATOLOGIA(?,?,?,?,?,?,?,?)',
+    //     [fechaInforme,horaInforme,descripcion,nivelUrgencia,pdf,nombrePdf,idExamen,idUsuario], (err, result) => {
+    //         if(err){ 
+    //             res.status(400).json(err)
+    //             return;
+    //         };
+    //         res.json(result);
+    //         return;
+    //     });
+    // });
+    };
 
 
 

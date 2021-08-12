@@ -6,8 +6,34 @@ const apiPatologia = require('../api/Api_Patologia.js');
 const apiImagenes = require('../api/Api_Imagenes.js');
 const apiTercerizado=require('../api/Api_Tercerizado');
 const multer = require('multer');
+const path=require('path');
+const { v4:uuidv4 } = require('uuid');
+const storage = multer.diskStorage({
+    destination:path.join(__dirname,'../imagenes'),
+    filename:(req,file,cb)=>{
+     cb(null, uuidv4()+path.extname(file.originalname).toLocaleLowerCase());
+    },
+    
+})
 
-
+const upload = multer({
+    storage,
+    
+    dest:path.join(__dirname,'../imagenes'),
+    fileFilter:(req,file,cb)=>{
+        console.log(file)
+        console.log('entre');
+        const filetypes=/jpg|jpeg|png/;
+        //testear siel mimetype es valido
+        const mimetype= filetypes.test(file.mimetype);
+        //textraer la etension del archivo para guardarlo
+        const extname = filetypes.test(path.extname(file.originalname));
+        if(mimetype && extname) 
+            return cb(null,true);
+        cb('Error en extension de archivo')
+    },
+    
+}).array('images')
 
 
 const {verificarAuth,verificarRolAdmin,verificarRolPatologia,verificarRolLaboratorioPams,
@@ -61,16 +87,16 @@ router.get('/listarExamPendientesLabChincha',[verificarAuth,verificarRolLaborato
 //Imagenes
 router.get('/listarEspecialidad',apiImagenes.listarEspecialidad);
 router.get('/listarTipoMuestraImagen',apiImagenes.listarTipoMuestraImagen);
-router.get('/listarMuestraImagen',apiImagenes.listarMuestraImagen);
+router.post('/listarMuestraImagen',apiImagenes.listarMuestraImagen);
 router.get('/listarTipoPlaca',apiImagenes.listarTipoPlaca);
 router.get('/listarTipoAtencion',apiImagenes.listarTipoAtencion);
 router.get('/listarRolMedico',apiImagenes.listarRolMedico);
 router.get('/listarMedico',apiImagenes.listarMedico);
 router.get('/listarEspecialidad',apiImagenes.listarEspecialidad);
 
-router.post('/guardarExamImagenes',[verificarAuth,verificarRolImagenes], apiImagenes.guardarExamImagenes);
+router.post('/guardarExamImagenes',[verificarAuth,verificarRolImagenes],upload, apiImagenes.guardarExamImagenes);
 router.post('/modificarExamImagenes',[verificarAuth,verificarRolImagenes], apiImagenes.modificarExamImagenes);
-
+router.post('/listarExamenesImagenes',[verificarAuth,verificarRolImagenes],apiImagenes.listarExamenesImagenes)
 
 
 //Admision
